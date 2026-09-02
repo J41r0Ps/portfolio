@@ -1,0 +1,38 @@
+# dependencies
+node_modules/
+.pnpm-store/
+
+# build output
+dist/
+.astro/
+.output/
+
+# environment — never commit secrets
+.env
+.env.*
+!.env.example
+
+# editor
+.vscode/*
+!.vscode/extensions.json
+!.vscode/settings.json
+.idea/
+*.swp
+
+# os
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# logs
+*.log
+npm-debug.log*
+yarn-error.log*
+
+# tooling caches
+.eslintcache
+.cache/
+coverage/
+
+# local notes not meant for the public repo
+scratch/
