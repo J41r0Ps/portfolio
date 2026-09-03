@@ -1,0 +1,29 @@
+---
+import BaseLayout from "@/layouts/BaseLayout.astro";
+import { useTranslations } from "@/i18n/utils";
+import type { Locale } from "@/i18n/config";
+import LocaleSwitcher from "@/components/LocaleSwitcher.astro";
+
+interface Props {
+  locale: Locale;
+}
+const { locale } = Astro.props;
+const t = useTranslations(locale);
+---
+
+<BaseLayout title={t("home.title")} description={t("home.meta.description")} locale={locale}>
+  <section class="hero-gradient min-h-screen">
+    <div class="container-page py-24">
+      <LocaleSwitcher locale={locale} />
+      <p class="font-mono text-sm tracking-widest text-accent uppercase">
+        {t("home.role")}
+      </p>
+      <h1 class="mt-6 font-display text-6xl font-bold text-text">
+        {t("home.title")}
+      </h1>
+      <p class="mt-4 max-w-xl text-lg text-text-muted">
+        {t("home.tagline")}
+      </p>
+    </div>
+  </section>
+</BaseLayout>

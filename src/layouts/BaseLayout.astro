@@ -7,24 +7,23 @@
  * reaches a visitor from this file is the theme script below, which is
  * deliberate and tiny.
  */
-import '@/styles/global.css';
+import "@/styles/global.css";
+import { LOCALE_TAGS, OG_LOCALES, type Locale } from "@/i18n/config";
+import { getAlternates } from "@/i18n/utils";
 
 interface Props {
   title: string;
   description: string;
-  /** BCP-47 language tag. Drives <html lang> and hreflang later. */
-  lang?: string;
-  /** Path to the social preview image, relative to /public. */
+  locale?: Locale;
   image?: string;
-  /** Set true on pages that should not be indexed. */
   noindex?: boolean;
 }
 
 const {
   title,
   description,
-  lang = 'en',
-  image = '/og/default.png',
+  locale = "en",
+  image = "/og/default.png",
   noindex = false,
 } = Astro.props;
 
@@ -32,13 +31,14 @@ const {
 // a relative path here is silently ignored.
 const canonicalURL = new URL(Astro.url.pathname, Astro.site);
 const socialImageURL = new URL(image, Astro.site);
+const alternates = getAlternates(Astro.url);
 
-const siteName = 'Jairo Nacurena';
+const siteName = "Jairo Nacurena";
 const fullTitle = title === siteName ? title : `${title} — ${siteName}`;
 ---
 
 <!doctype html>
-<html lang={lang}>
+<html lang={LOCALE_TAGS[locale]}>
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
@@ -48,6 +48,13 @@ const fullTitle = title === siteName ? title : `${title} — ${siteName}`;
     <link rel="canonical" href={canonicalURL} />
     {noindex && <meta name="robots" content="noindex, nofollow" />}
 
+    {
+      alternates.map(({ locale: alt, path }) => (
+        <link rel="alternate" hreflang={LOCALE_TAGS[alt]} href={new URL(path, Astro.site)} />
+      ))
+    }
+    <link rel="alternate" hreflang="x-default" href={new URL("/", Astro.site)} />
+
     <!-- Open Graph -->
     <meta property="og:type" content="website" />
     <meta property="og:site_name" content={siteName} />
@@ -55,7 +62,7 @@ const fullTitle = title === siteName ? title : `${title} — ${siteName}`;
     <meta property="og:description" content={description} />
     <meta property="og:image" content={socialImageURL} />
     <meta property="og:url" content={canonicalURL} />
-    <meta property="og:locale" content={lang} />
+    <meta property="og:locale" content={OG_LOCALES[locale]} />
 
     <!-- Twitter/X -->
     <meta name="twitter:card" content="summary_large_image" />
@@ -80,10 +87,10 @@ const fullTitle = title === siteName ? title : `${title} — ${siteName}`;
     -->
     <script is:inline>
       (() => {
-        const stored = localStorage.getItem('theme');
-        const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
-        const theme = stored ?? (prefersDark ? 'dark' : 'light');
-        document.documentElement.classList.toggle('dark', theme === 'dark');
+        const stored = localStorage.getItem("theme");
+        const prefersDark = window.matchMedia("(prefers-color-scheme: dark)").matches;
+        const theme = stored ?? (prefersDark ? "dark" : "light");
+        document.documentElement.classList.toggle("dark", theme === "dark");
         document.documentElement.style.colorScheme = theme;
       })();
     </script>
