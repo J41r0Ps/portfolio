@@ -1,0 +1,44 @@
+---
+import BaseLayout from "@/layouts/BaseLayout.astro";
+---
+
+<BaseLayout
+  title="Jairo Nacurena"
+  description="Applied Computer Science student at Thomas More Geel. Full-stack and backend development, data science, and cloud infrastructure."
+>
+  <section class="hero-gradient min-h-screen">
+    <div class="container-page py-24">
+      <p class="font-mono text-sm tracking-widest text-accent uppercase">01 — Scaffold</p>
+
+      <h1 class="mt-6 font-display text-6xl font-bold text-text">Jairo Nacurena</h1>
+
+      <p class="mt-4 max-w-xl text-lg text-text-muted">
+        Applied Computer Science at Thomas More Geel. Building backend APIs, data pipelines and
+        full-stack applications.
+      </p>
+
+      <!-- Token check. Every swatch below uses a semantic token, so both
+           themes are correct with no `dark:` class anywhere in this file. -->
+      <div class="mt-16 grid max-w-2xl grid-cols-2 gap-4 xs:grid-cols-3">
+        <div class="rounded-lg border border-border bg-surface-raised p-4 shadow-card-light">
+          <p class="font-mono text-xs text-text-muted">surface-raised</p>
+        </div>
+        <div class="rounded-lg border border-border bg-surface-sunken p-4">
+          <p class="font-mono text-xs text-text-muted">surface-sunken</p>
+        </div>
+        <div class="rounded-lg bg-accent p-4">
+          <p class="font-mono text-xs text-on-accent">accent</p>
+        </div>
+      </div>
+
+      <a
+        href="#main"
+        class="mt-10 inline-block rounded-md bg-accent px-5 py-2.5
+               font-mono text-sm text-on-accent transition-colors
+               hover:bg-accent-hover"
+      >
+        Focus me with Tab
+      </a>
+    </div>
+  </section>
+</BaseLayout>

@@ -140,6 +140,24 @@ and no runtime API.
 Keep it public, archive it read-only, and add a pointer to v2 explaining what was rebuilt
 and why.
 
+---
+
+## ADR-007 · Two-layer design tokens
+
+**Date**: 2026-09 · **Status**: accepted
+
+**Context**
+The v1 palette named colours by theme (`primary` dark, `primary-light` light), so every
+component needed paired classes — `bg-primary dark:bg-primary-light` — and the correct
+accent for each background had to be chosen by hand.
+
+**Decision**
+Split into primitives (`--color-pine-850`, `--color-sage-500`) and semantic tokens
+(`--surface`, `--text-muted`, `--accent`). Components reference semantics only. Theme
+switching remaps the semantic layer.
+
+---
+
 **Consequences**
 
 - Commit history is preserved as dated evidence of authorship.
@@ -147,6 +165,12 @@ and why.
   rebuild stronger than the original course submission.
 - `jaironacurena.me` was included free with the `.com` registration. It is not used and
   auto-renew is disabled; it will be allowed to lapse.
+- No `dark:` variant needed for colour anywhere in the codebase.
+- Contrast-correct accent per theme is handled once, not per component.
+- Semantic tokens are real CSS variables, so the WebGL scene can read the same values
+  as the DOM via `getComputedStyle` — one palette across CSS and Three.js.
+- Requires discipline: reaching for a primitive in a component is the smell to watch for.
+
 ---
 
 # Asset licence audit

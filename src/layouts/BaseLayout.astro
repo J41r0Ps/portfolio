@@ -1,0 +1,119 @@
+---
+/**
+ * BaseLayout — the shell every page renders inside.
+ *
+ * Everything in this frontmatter block runs at BUILD TIME, on your
+ * machine. None of it ships to the browser. The only JavaScript that
+ * reaches a visitor from this file is the theme script below, which is
+ * deliberate and tiny.
+ */
+import '@/styles/global.css';
+
+interface Props {
+  title: string;
+  description: string;
+  /** BCP-47 language tag. Drives <html lang> and hreflang later. */
+  lang?: string;
+  /** Path to the social preview image, relative to /public. */
+  image?: string;
+  /** Set true on pages that should not be indexed. */
+  noindex?: boolean;
+}
+
+const {
+  title,
+  description,
+  lang = 'en',
+  image = '/og/default.png',
+  noindex = false,
+} = Astro.props;
+
+// Absolute URLs. Social platforms and canonical tags both require them —
+// a relative path here is silently ignored.
+const canonicalURL = new URL(Astro.url.pathname, Astro.site);
+const socialImageURL = new URL(image, Astro.site);
+
+const siteName = 'Jairo Nacurena';
+const fullTitle = title === siteName ? title : `${title} — ${siteName}`;
+---
+
+<!doctype html>
+<html lang={lang}>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <title>{fullTitle}</title>
+    <meta name="description" content={description} />
+    <link rel="canonical" href={canonicalURL} />
+    {noindex && <meta name="robots" content="noindex, nofollow" />}
+
+    <!-- Open Graph -->
+    <meta property="og:type" content="website" />
+    <meta property="og:site_name" content={siteName} />
+    <meta property="og:title" content={fullTitle} />
+    <meta property="og:description" content={description} />
+    <meta property="og:image" content={socialImageURL} />
+    <meta property="og:url" content={canonicalURL} />
+    <meta property="og:locale" content={lang} />
+
+    <!-- Twitter/X -->
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content={fullTitle} />
+    <meta name="twitter:description" content={description} />
+    <meta name="twitter:image" content={socialImageURL} />
+
+    <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
+    <link rel="sitemap" href="/sitemap-index.xml" />
+
+    <!--
+      THEME — must run before first paint.
+
+      `is:inline` tells Astro to leave this script exactly as written and
+      put it in the HTML, rather than bundling it as a module. A bundled
+      module is deferred, which means the browser would paint the page
+      first and apply the theme afterwards: a white flash on every
+      dark-mode page load.
+
+      Reading localStorage is synchronous and this is ~10 lines, so the
+      cost is negligible and the flash never happens.
+    -->
+    <script is:inline>
+      (() => {
+        const stored = localStorage.getItem('theme');
+        const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+        const theme = stored ?? (prefersDark ? 'dark' : 'light');
+        document.documentElement.classList.toggle('dark', theme === 'dark');
+        document.documentElement.style.colorScheme = theme;
+      })();
+    </script>
+
+    <!-- Matches the painted background so mobile browser chrome blends in. -->
+    <meta name="theme-color" content="#f6f7f5" media="(prefers-color-scheme: light)" />
+    <meta name="theme-color" content="#101619" media="(prefers-color-scheme: dark)" />
+  </head>
+
+  <body class="bg-surface text-text antialiased">
+    <!--
+      Skip link: first thing a keyboard user reaches. Visually hidden
+      until focused, then it appears. Without it, tabbing to the content
+      means tabbing through the entire navigation on every page.
+    -->
+    <a
+      href="#main"
+      class="sr-only focus:not-sr-only focus:fixed focus:top-4 focus:left-4 focus:z-50
+             focus:rounded-md focus:bg-accent focus:px-4 focus:py-2
+             focus:font-mono focus:text-sm focus:text-on-accent"
+    >
+      Skip to content
+    </a>
+
+    <slot name="header" />
+
+    <main id="main">
+      <slot />
+    </main>
+
+    <slot name="footer" />
+  </body>
+</html>
