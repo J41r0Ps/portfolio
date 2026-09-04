@@ -1,0 +1,102 @@
+---
+/**
+ * ThemeToggle — switches between light and dark, and remembers it.
+ *
+ * Deliberately NOT a React island. This is a class toggle and a
+ * localStorage write; hydrating React for it would ship ~45kb on every
+ * page to save six lines of DOM code. An island has to earn its bundle.
+ *
+ * The <script> below is a normal Astro script, not `is:inline`: it only
+ * runs on click, so being deferred costs nothing, and Astro bundles and
+ * minifies it. The *init* script in BaseLayout must stay `is:inline`,
+ * because that one has to beat the first paint.
+ */
+import { useTranslations } from "@/i18n/utils";
+import type { Locale } from "@/i18n/config";
+
+interface Props {
+  locale: Locale;
+  class?: string;
+}
+
+const { locale, class: className = "" } = Astro.props;
+const t = useTranslations(locale);
+---
+
+<button
+  type="button"
+  data-theme-toggle
+  aria-label={t("a11y.toggleTheme")}
+  class:list={[
+    "inline-flex h-9 w-9 items-center justify-center rounded-md",
+    "text-text-muted transition-colors hover:bg-surface-sunken hover:text-text",
+    className,
+  ]}
+>
+  {/* Shown in light mode: click to go dark. */}
+  <svg
+    class="h-[18px] w-[18px] dark:hidden"
+    viewBox="0 0 24 24"
+    fill="none"
+    stroke="currentColor"
+    stroke-width="1.75"
+    stroke-linecap="round"
+    stroke-linejoin="round"
+    aria-hidden="true"
+  >
+    <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>
+  </svg>
+
+  {/* Shown in dark mode: click to go light. */}
+  <svg
+    class="hidden h-[18px] w-[18px] dark:block"
+    viewBox="0 0 24 24"
+    fill="none"
+    stroke="currentColor"
+    stroke-width="1.75"
+    stroke-linecap="round"
+    stroke-linejoin="round"
+    aria-hidden="true"
+  >
+    <circle cx="12" cy="12" r="4"></circle>
+    <path
+      d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M6.34 17.66l-1.41 1.41M19.07 4.93l-1.41 1.41"
+    ></path>
+  </svg>
+</button>
+
+<script>
+  /**
+   * Both icons are always in the DOM; CSS decides which is visible based
+   * on the `dark` class. No JavaScript needed to swap them, and no
+   * chance of the icon disagreeing with the theme.
+   */
+  function applyTheme(theme: "light" | "dark") {
+    const root = document.documentElement;
+
+    root.classList.toggle("dark", theme === "dark");
+    root.style.colorScheme = theme;
+    localStorage.setItem("theme", theme);
+  }
+
+  function initToggles() {
+    const buttons = document.querySelectorAll<HTMLButtonElement>("[data-theme-toggle]");
+
+    for (const button of buttons) {
+      button.addEventListener("click", () => {
+        const isDark = document.documentElement.classList.contains("dark");
+        applyTheme(isDark ? "light" : "dark");
+      });
+    }
+  }
+
+  initToggles();
+
+  /**
+   * View Transitions swap the <body> without a full page load, which
+   * would leave the new buttons without listeners. Re-running after each
+   * swap keeps it working. Harmless if View Transitions are never
+   * enabled — the event simply never fires.
+   */
+  document.addEventListener("astro:after-swap", initToggles);
+</script>

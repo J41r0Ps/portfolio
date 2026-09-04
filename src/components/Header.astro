@@ -1,0 +1,175 @@
+---
+/**
+ * Header — the site chrome.
+ *
+ * Zero JavaScript except the theme toggle and the mobile menu, both
+ * vanilla. Nav links, the active state and the CV href are all resolved
+ * at build time.
+ */
+import { CV_FILES, type Locale } from "@/i18n/config";
+import { localizePath, stripLocale, useTranslations } from "@/i18n/utils";
+import { NAV_ITEMS } from "@/lib/nav";
+import LocaleSwitcher from "@/components/LocaleSwitcher.astro";
+import ThemeToggle from "@/components/ThemeToggle.astro";
+import Logo from "@/assets/logo.svg";
+import Button from "@/components/ui/Button.astro";
+
+interface Props {
+  locale: Locale;
+}
+
+const { locale } = Astro.props;
+const t = useTranslations(locale);
+
+/**
+ * The active-link check compares locale-stripped paths, so /nl/projects
+ * matches the 'projects' item just as /projects does. Without stripping,
+ * nothing would ever look active outside English.
+ */
+const currentPath = stripLocale(Astro.url.pathname);
+
+const isActive = (path: string) =>
+  path === "/" ? currentPath === "/" : currentPath.startsWith(path);
+
+const homeHref = localizePath("/", locale);
+const cvHref = CV_FILES[locale];
+---
+
+<header class="sticky top-0 z-40 border-b border-border
+         bg-surface/80 backdrop-blur-md">
+  <div class="container-page flex h-16 items-center justify-between gap-4">
+    <a
+      href={homeHref}
+      class="flex shrink-0 items-center gap-2 font-display text-base font-bold
+         tracking-tight text-text transition-colors hover:text-accent"
+    >
+      <Logo class="h-8 w-auto" />
+      <span>
+        Jairo<span class="hidden xs:inline"> Nacurena</span>
+      </span>
+    </a>
+
+    <!-- Desktop navigation -->
+    <nav class="hidden md:block" aria-label="Main">
+      <ul class="flex items-center gap-1">
+        {
+          NAV_ITEMS.map((item) => (
+            <li>
+              <a
+                href={localizePath(item.path, locale)}
+                aria-current={isActive(item.path) ? "page" : undefined}
+                class:list={[
+                  "rounded-md px-3 py-2 text-sm transition-colors",
+                  isActive(item.path) ? "text-accent" : "text-text-muted hover:text-text",
+                ]}
+              >
+                {t(item.key)}
+              </a>
+            </li>
+          ))
+        }
+      </ul>
+    </nav>
+
+    <div class="flex items-center gap-2">
+      <LocaleSwitcher locale={locale} />
+      <ThemeToggle locale={locale} />
+
+      <Button href={cvHref} download size="sm" class="hidden sm:inline-flex">
+        {t("cta.downloadCV")}
+      </Button>
+
+      <!-- Mobile menu trigger -->
+      <button
+        type="button"
+        data-menu-toggle
+        aria-expanded="false"
+        aria-controls="mobile-nav"
+        aria-label={t("nav.menu.open")}
+        class="inline-flex h-9 w-9 items-center justify-center rounded-md
+               text-text-muted transition-colors hover:bg-surface-sunken
+               hover:text-text md:hidden"
+      >
+        <svg
+          class="h-5 w-5"
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          stroke-width="1.75"
+          stroke-linecap="round"
+          aria-hidden="true"
+        >
+          <path d="M4 7h16M4 12h16M4 17h16"></path>
+        </svg>
+      </button>
+    </div>
+  </div>
+
+  <!--
+    Mobile navigation.
+
+    `hidden` rather than conditional rendering: the links are always in
+    the HTML, so a crawler sees the full navigation on every page. Only
+    visibility changes.
+  -->
+  <nav id="mobile-nav" hidden aria-label="Main" class="border-t border-border bg-surface md:hidden">
+    <ul class="container-page flex flex-col py-2">
+      {
+        NAV_ITEMS.map((item) => (
+          <li>
+            <a
+              href={localizePath(item.path, locale)}
+              aria-current={isActive(item.path) ? "page" : undefined}
+              class:list={[
+                "block rounded-md px-3 py-2.5 text-sm transition-colors",
+                isActive(item.path) ? "text-accent" : "text-text-muted hover:text-text",
+              ]}
+            >
+              {t(item.key)}
+            </a>
+          </li>
+        ))
+      }
+      <li class="pt-2 pb-1">
+        <a
+          href={cvHref}
+          download
+          class="block rounded-md bg-accent px-3 py-2.5 text-center
+                 font-mono text-xs text-on-accent"
+        >
+          {t("cta.downloadCV")}
+        </a>
+      </li>
+    </ul>
+  </nav>
+</header>
+
+<script>
+  function initMenu() {
+    const button = document.querySelector<HTMLButtonElement>("[data-menu-toggle]");
+    const nav = document.querySelector<HTMLElement>("#mobile-nav");
+
+    if (!button || !nav) return;
+
+    const setOpen = (open: boolean) => {
+      nav.hidden = !open;
+      button.setAttribute("aria-expanded", String(open));
+    };
+
+    button.addEventListener("click", () => {
+      setOpen(button.getAttribute("aria-expanded") !== "true");
+    });
+
+    // Escape closes it and returns focus to the trigger — otherwise a
+    // keyboard user is stranded inside a menu they can't dismiss.
+    document.addEventListener("keydown", (event) => {
+      if (event.key === "Escape" && button.getAttribute("aria-expanded") === "true") {
+        setOpen(false);
+        button.focus();
+      }
+    });
+  }
+
+  initMenu();
+  document.addEventListener("astro:after-swap", initMenu);
+</script>

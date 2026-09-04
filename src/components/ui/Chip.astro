@@ -1,0 +1,50 @@
+---
+/**
+ * Chip — a tag. Used for technologies, topics and filter controls.
+ *
+ * Three states because a chip does three different jobs:
+ *   static   — a label on a project card. Not interactive.
+ *   toggle   — a filter control. Interactive, can be active.
+ *   active   — a filter control that is currently on.
+ *
+ * The count is optional and rendered dimmer, so "React 4" reads as one
+ * chip rather than two pieces of information.
+ */
+import type { HTMLAttributes } from "astro/types";
+
+interface Props extends HTMLAttributes<"span"> {
+  /** Shown after the label, e.g. how many projects use this tech. */
+  count?: number;
+  /** Renders as a button instead of a span. */
+  interactive?: boolean;
+  active?: boolean;
+}
+
+const { count, interactive = false, active = false, class: className = "", ...rest } = Astro.props;
+
+const base =
+  "inline-flex items-center gap-1.5 rounded-full border px-2.5 py-1 " +
+  "font-mono text-[11px] leading-none whitespace-nowrap";
+
+const state = active ? "border-accent bg-accent text-on-accent" : "border-border text-text-muted";
+
+const interactivity = interactive
+  ? "transition-colors cursor-pointer hover:border-accent hover:text-accent"
+  : "";
+
+const classes = [base, state, interactivity, className];
+---
+
+{
+  interactive ? (
+    <button type="button" aria-pressed={active} class:list={classes} {...rest}>
+      <slot />
+      {count !== undefined && <span class="opacity-60">{count}</span>}
+    </button>
+  ) : (
+    <span class:list={classes} {...rest}>
+      <slot />
+      {count !== undefined && <span class="opacity-60">{count}</span>}
+    </span>
+  )
+}

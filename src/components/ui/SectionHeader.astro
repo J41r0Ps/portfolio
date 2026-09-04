@@ -1,0 +1,35 @@
+---
+/**
+ * SectionHeader — the numbered section heading carried over from v1.
+ *
+ * The monospace number is a strong, cheap piece of visual identity: it
+ * signals structure without decoration and reads as engineering rather
+ * than marketing.
+ *
+ * `as` exists because heading level is a document-structure decision,
+ * not a styling one. A section inside another section may need an <h3>
+ * while looking identical. Screen readers navigate by heading level, so
+ * skipping levels for visual reasons genuinely breaks navigation.
+ */
+interface Props {
+  /** Zero-padded automatically: 1 renders as "01". */
+  number?: number;
+  title: string;
+  subtitle?: string;
+  as?: "h1" | "h2" | "h3";
+  class?: string;
+}
+
+const { number, title, subtitle, as: Tag = "h2", class: className = "" }: Props = Astro.props;
+const label = number !== undefined ? String(number).padStart(2, "0") : undefined;
+---
+
+<div class:list={["flex flex-col gap-2", className]}>
+  {label && <span class="font-mono text-xs tracking-widest text-accent uppercase">{label} —</span>}
+
+  <Tag class="font-display text-3xl font-bold tracking-tight text-text sm:text-4xl">
+    {title}
+  </Tag>
+
+  {subtitle && <p class="max-w-2xl text-text-muted">{subtitle}</p>}
+</div>

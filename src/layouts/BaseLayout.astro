@@ -10,6 +10,8 @@
 import "@/styles/global.css";
 import { LOCALE_TAGS, OG_LOCALES, type Locale } from "@/i18n/config";
 import { getAlternates } from "@/i18n/utils";
+import Header from "@/components/Header.astro";
+import Footer from "@/components/Footer.astro";
 
 interface Props {
   title: string;
@@ -115,12 +117,12 @@ const fullTitle = title === siteName ? title : `${title} — ${siteName}`;
       Skip to content
     </a>
 
-    <slot name="header" />
+    <Header locale={locale} />
 
     <main id="main">
       <slot />
     </main>
 
-    <slot name="footer" />
+    <Footer locale={locale} />
   </body>
 </html>

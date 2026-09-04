@@ -1,0 +1,141 @@
+---
+/**
+ * Footer.
+ *
+ * Zero JavaScript. The year is computed at BUILD time, not in the
+ * browser — a `new Date()` in client script would be one more script for
+ * something the build already knows.
+ *
+ * Note that means the year updates when you deploy, not at midnight on
+ * 1 January. For a site that redeploys regularly this is fine; if it
+ * ever isn't, the fix is a scheduled rebuild, not client-side JS.
+ */
+import { LOCALE_LABELS, type Locale } from '@/i18n/config';
+import { localizePath, useTranslations } from '@/i18n/utils';
+import { NAV_ITEMS } from '@/lib/nav';
+import { SITE, SOCIALS } from '@/lib/site';
+
+interface Props {
+  locale: Locale;
+}
+
+const { locale } = Astro.props;
+const t = useTranslations(locale);
+
+const year = new Date().getFullYear();
+---
+
+<footer class="border-t border-border bg-surface-sunken">
+  <div class="container-page py-12">
+    <div class="flex flex-col gap-10 md:flex-row md:justify-between">
+      <!-- Identity -->
+      <div class="max-w-xs">
+        <p class="font-display text-lg font-bold text-text">{SITE.name}</p>
+        <p class="mt-2 text-sm text-text-muted">{t('home.role')}</p>
+        <p class="mt-1 font-mono text-xs text-text-muted">{SITE.location}</p>
+
+        <ul class="mt-5 flex items-center gap-2">
+          {
+            SOCIALS.map((social) => (
+              <li>
+                <a
+                  href={social.href}
+                  target={social.icon === 'mail' ? undefined : '_blank'}
+                  rel={social.icon === 'mail' ? undefined : 'noopener noreferrer'}
+                  class="inline-flex h-9 w-9 items-center justify-center rounded-md
+                         text-text-muted transition-colors hover:bg-surface
+                         hover:text-accent"
+                >
+                  {/* The icon is decorative; the label carries the meaning. */}
+                  <span class="sr-only">{social.label}</span>
+
+                  <svg
+                    class="h-[18px] w-[18px]"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    stroke-width="1.75"
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    aria-hidden="true"
+                  >
+                    {social.icon === 'github' && (
+                      <path d="M9 19c-5 1.5-5-2.5-7-3m14 6v-3.87a3.37 3.37 0 0 0-.94-2.61c3.14-.35 6.44-1.54 6.44-7A5.44 5.44 0 0 0 20 4.77 5.07 5.07 0 0 0 19.91 1S18.73.65 16 2.48a13.38 13.38 0 0 0-7 0C6.27.65 5.09 1 5.09 1A5.07 5.07 0 0 0 5 4.77a5.44 5.44 0 0 0-1.5 3.78c0 5.42 3.3 6.61 6.44 7A3.37 3.37 0 0 0 9 18.13V22" />
+                    )}
+
+                    {social.icon === 'linkedin' && (
+                      <>
+                        <path d="M16 8a6 6 0 0 1 6 6v7h-4v-7a2 2 0 0 0-4 0v7h-4v-7a6 6 0 0 1 6-6z" />
+                        <rect x="2" y="9" width="4" height="12" />
+                        <circle cx="4" cy="4" r="2" />
+                      </>
+                    )}
+
+                    {social.icon === 'mail' && (
+                      <>
+                        <rect x="2" y="4" width="20" height="16" rx="2" />
+                        <path d="m22 7-10 6L2 7" />
+                      </>
+                    )}
+                  </svg>
+                </a>
+              </li>
+            ))
+          }
+        </ul>
+      </div>
+
+      <!-- Navigation, repeated. Not redundant: someone who has read to
+           the bottom of a page should not have to scroll back up. -->
+      <nav aria-label="Footer">
+        <ul class="flex flex-col gap-2">
+          {
+            NAV_ITEMS.map((item) => (
+              <li>
+                <a
+                  href={localizePath(item.path, locale)}
+                  class="text-sm text-text-muted transition-colors hover:text-accent"
+                >
+                  {t(item.key)}
+                </a>
+              </li>
+            ))
+          }
+        </ul>
+      </nav>
+
+      <!-- Languages. A visitor who lands on an English page from a
+           search result may not have scrolled past the header. -->
+      <nav aria-label={t('a11y.selectLanguage')}>
+        <ul class="flex flex-col gap-2">
+          {
+            (Object.keys(LOCALE_LABELS) as Locale[]).map((alt) => (
+              <li>
+                <a
+                  href={localizePath('/', alt)}
+                  hreflang={alt}
+                  lang={alt}
+                  class:list={[
+                    'text-sm transition-colors hover:text-accent',
+                    alt === locale ? 'text-text' : 'text-text-muted',
+                  ]}
+                >
+                  {LOCALE_LABELS[alt]}
+                </a>
+              </li>
+            ))
+          }
+        </ul>
+      </nav>
+    </div>
+
+    <!-- Colophon -->
+    <div
+      class="mt-10 flex flex-col gap-2 border-t border-border pt-6
+             font-mono text-xs text-text-muted sm:flex-row sm:justify-between"
+    >
+      <p>© {year} {SITE.name} — {t('footer.rights')}</p>
+      <p>{t('footer.builtWith')}</p>
+    </div>
+  </div>
+</footer>
