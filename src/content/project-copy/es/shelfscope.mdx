@@ -1,0 +1,92 @@
+---
+project: shelfscope
+locale: es
+
+title: ShelfScope — construir un dataset desde cero
+summary: >-
+  Un dataset de 1.000 libros extraído, limpiado y analizado de principio a
+  fin, que acabó demostrando que los datos de origen eran sintéticos.
+
+role: Proyecto individual
+
+coverAlt: Histograma de niveles de stock que muestra dos grupos diferenciados
+
+metrics:
+  - label: Libros extraídos
+    value: "1.000"
+  - label: Páginas descargadas
+    value: "1.050"
+  - label: Líneas de evidencia
+    value: "5"
+  - label: Etiquetas sin sentido
+    value: 22%
+---
+
+## El problema
+
+La mayoría de los proyectos de datos a nivel de curso parten de un CSV ya
+preparado, lo que se salta justamente las dos etapas donde está el trabajo
+real. Este construye su propio dataset, así que Obtain y Scrub son
+ingeniería de verdad y no una llamada a `read_csv`.
+
+## Qué construí
+
+Scraping en dos pasadas: cincuenta páginas de listado para título, precio,
+valoración y disponibilidad, y después las mil páginas de detalle para
+categoría, descripción, UPC, stock exacto y número de reseñas. La segunda
+pasada era necesaria porque la categoría — la única variable categórica
+útil — solo aparece en las migas de pan de cada libro.
+
+La paginación sigue el enlace `next` en lugar de recorrer `range(1, 51)`,
+de modo que termina según la estructura del sitio y no según una
+suposición. Cada petición va envuelta en `try`/`except`, para que un fallo
+no eche a perder veinte minutos de ejecución.
+
+La regla de diseño era que el notebook 01 solo obtiene y nada más. Cada
+valor se guarda exactamente como se extrajo — `£51.77`,
+`In stock (22 available)`, `Three` — de ahí los sufijos `_raw` en las
+columnas. La limpieza ocurre en el notebook 03. Así el scraping lento se
+ejecuta una vez y la lógica de limpieza puede reescribirse libremente.
+
+## El hallazgo que no esperaba
+
+**Los datos numéricos son sintéticos, y cinco líneas de evidencia
+independientes lo demuestran.** El precio es plano entre £10 y £59,99 con
+una asimetría de −0,037. Las valoraciones son casi uniformes. Todas las
+correlaciones por pares caen dentro de ±0,03. Un test de permutación no
+encuentra efecto de la categoría sobre el precio (p = 0,977). Ambos
+métodos de detección de atípicos devuelven cero resultados, porque no hay
+colas en la distribución que encontrar.
+
+Reportar "aquí no hay efecto" como resultado — en lugar de buscar una
+historia — fue la decisión honesta, y la más útil.
+
+## Dónde estaba el hallazgo real
+
+En la variable categórica. El 22% de los libros (219) está en categorías
+que no son géneros: `Default` (152) y `Add a comment` (67), esta última un
+elemento de interfaz capturado como miga de pan.
+
+Las comprobaciones estándar de valores faltantes no detectan esto en
+absoluto. Los valores están presentes, simplemente no significan nada.
+`isna()` informa de una columna limpia. Solo el ranking de frecuencias lo
+sacó a la luz.
+
+El stock fue la única variable con estructura real: multimodal, agrupada
+en torno a 3 y 14–16 con una banda dispersa en medio. Su estadístico de
+asimetría (+0,212) se lee como "ligeramente sesgado a la derecha" y pierde
+por completo la multimodalidad — en un solo número, el argumento para
+graficar antes de resumir.
+
+## El bug que vale la pena recordar
+
+Veinte de las mil peticiones a páginas de detalle devolvieron 404 con una
+ruta duplicada: `/catalogue/catalogue/...`. El `href` del título de un
+libro es relativo *a la página de la que procede*: la página 1 da
+`catalogue/book/index.html`, y las páginas 2–50 dan
+`../../../catalogue/book/index.html`. Quitar los prefijos `../` dejaba
+intacto el `catalogue/` propio de la página 1, y luego se le anteponía
+otro.
+
+Exactamente veinte fallos — el contenido de una página de listado — fue la
+pista.

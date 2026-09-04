@@ -1,0 +1,85 @@
+---
+project: shelfscope
+locale: en
+
+title: ShelfScope — building a dataset from scratch
+summary: >-
+  A 1,000-book dataset scraped, cleaned and analysed end to end, which
+  ended up proving its own source data was synthetic.
+
+role: Solo project
+
+coverAlt: Histogram of book stock levels showing two distinct clusters
+
+metrics:
+  - label: Books scraped
+    value: "1,000"
+  - label: Pages fetched
+    value: "1,050"
+  - label: Evidence lines
+    value: "5"
+  - label: Meaningless labels found
+    value: 22%
+---
+
+## The problem
+
+Most course-level data projects start from a ready-made CSV, which skips
+the two stages where the real work lives. This one builds its own dataset,
+so Obtain and Scrub are actual engineering rather than a `read_csv` call.
+
+## What I built
+
+Two-pass scraping: fifty listing pages for title, price, rating and
+availability, then all thousand detail pages for category, description,
+UPC, exact stock and review count. The second pass was necessary because
+category — the only useful categorical variable — appears solely in each
+book's breadcrumb.
+
+Pagination follows the `next` link rather than looping over `range(1, 51)`,
+so it terminates on the site's own structure instead of on an assumption.
+Each request is wrapped in `try`/`except`, so one failure doesn't discard a
+twenty-minute run.
+
+The design rule was that notebook 01 obtains and does nothing else. Every
+value is stored exactly as scraped — `£51.77`, `In stock (22 available)`,
+`Three` — hence the `_raw` column suffixes. Cleaning happens in notebook
+03. That way the slow scrape runs once and the cleaning logic can be
+rewritten freely.
+
+## The finding I did not expect
+
+**The numeric data is synthetic, and five independent lines of evidence
+prove it.** Price is flat across £10–£59.99 with skew −0.037. Ratings are
+near-uniform. Every pairwise correlation falls within ±0.03. A permutation
+test finds no category effect on price (p = 0.977). Both outlier methods
+return zero results, because there are no distributional tails to find.
+
+Reporting "there is no effect here" as the result — rather than hunting
+for a story — was the honest call, and the more useful one.
+
+## Where the real finding was
+
+In the categorical variable. 22% of books (219) sit in non-genre
+categories: `Default` (152) and `Add a comment` (67) — the latter a UI
+element captured as a breadcrumb.
+
+Standard missing-value checks miss this completely. The values are
+present, they're just meaningless. `isna()` reports a clean column. Only
+frequency ranking exposed it.
+
+Stock was the only variable with real structure: multimodal, clustering
+around 3 and 14–16 with a sparse band between. Its skew statistic
+(+0.212) reads as "mildly right-skewed" and misses the multimodality
+entirely — which is the argument for plotting before summarising, in one
+number.
+
+## The bug worth remembering
+
+Twenty of a thousand detail-page requests returned 404s with a doubled
+path: `/catalogue/catalogue/...`. The `href` on a book title is relative
+*to the page it came from* — page 1 gives `catalogue/book/index.html`,
+pages 2–50 give `../../../catalogue/book/index.html`. Stripping the `../`
+prefixes left page 1's own `catalogue/` intact, then prepended another.
+
+Exactly twenty failures — one listing page's worth — was the clue.

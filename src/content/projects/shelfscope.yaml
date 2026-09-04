@@ -1,0 +1,33 @@
+# src/content/projects/shelfscope.yaml
+
+name: ShelfScope
+
+category: data-science
+context: personal
+status: complete
+
+year: 2026
+period: 5 days
+
+featured: false
+order: 3
+
+tech:
+  - Python
+  - Requests
+  - BeautifulSoup
+  - NumPy
+  - Matplotlib
+  - Jupyter
+  - Git
+
+topics:
+  - Web Scraping
+  - Data Cleaning
+  - Statistical Analysis
+  - Data Visualisation
+
+links:
+  repo: https://github.com/J41r0Ps/shelfscope
+
+# cover: ../../assets/projects/shelfscope-cover.png

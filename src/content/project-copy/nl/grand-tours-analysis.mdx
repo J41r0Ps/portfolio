@@ -1,0 +1,109 @@
+---
+project: grand-tours-analysis
+locale: nl
+
+title: Grand Tours Analysis — 120 jaar wielrennen
+summary: >-
+  Een volledige datapijplijn over de Tour, de Giro en de Vuelta, van
+  scraping tot statistiek, met de opgeschoonde datasets als open data.
+
+role: Soloproject
+
+coverAlt: Lijngrafiek van de gemiddelde winnende snelheid in de drie grote rondes sinds 1903
+
+metrics:
+  - label: Ritten-edities
+    value: "333"
+  - label: Renners
+    value: "161"
+  - label: Unit tests
+    value: "28"
+  - label: Wikidata-match
+    value: 96,9%
+---
+
+## Het probleem
+
+De beoordeelde versie van dit project behandelde één ronde, verbood
+Pandas, en beantwoordde vier vragen met vier losse bestanden zonder
+gedeelde sleutel. Het voldeed aan de opdracht, maar het had niet de vorm
+die de vraag vereiste die ik eigenlijk wilde stellen: gedragen de drie
+grote rondes zich als één sport, of als drie?
+
+Dus heb ik het herbouwd. Drie rondes in plaats van één, een echt
+relationeel model, een getest `src/`-pakket, en het origineel bewaard in
+`legacy/` als bewust voor-en-na.
+
+## Wat ik gebouwd heb
+
+Twee nette tabellen vervangen vier ad-hocbestanden: `editions` (333 rijen,
+één per editie) en `riders` (161 rijen, met overwinningen per ronde),
+gekoppeld via een gedeelde sleutel.
+
+De drie Wikipedia-pagina's schrijven dezelfde kolommen anders —
+`Sponsor/Team`, `Sponsor / team`, `Sponsor/team`. In plaats van op positie
+te indexeren normaliseer ik de headers en zoek ik ze op in een aliastabel.
+Zo verwerkt één functie alle drie de rondes, en blijft het werken als
+Wikipedia kolommen herschikt.
+
+Geboortedata van renners kwamen via SPARQL uit Wikidata in vier gebundelde
+verzoeken, in plaats van een honderdtal losse pagina's te scrapen. Namen
+die twee verschillende geboortedata opleverden zijn uitgesloten, niet
+geraden: er één kiezen plaatst een geloofwaardige foute waarde die verderop
+niet meer te detecteren is.
+
+## De belangrijkste modelleerbeslissing
+
+Edities hadden vier statussen nodig, geen geldig/ongeldig-vlag: `held`
+(294), `no_race` (23, de wereldoorlogen), `disputed` (7, de geschrapte
+Tours van 1999–2005) en `team_only` (1).
+
+Betwiste edities hebben routes en afstanden en horen dus thuis in analyse
+op routeniveau — maar er is geen winnaar aan toe te kennen. Een binaire
+vlag dwingt een fout antwoord af op één van die twee vragen. Vier
+statussen beantwoorden ze allebei correct.
+
+## Wat de data zegt
+
+Convergentie is het terugkerende patroon. De afstand ging van meer dan
+2.000 km verschil in de jaren twintig naar ongeveer 200; de snelheid van
+4 km/u verschil naar minder dan 2 sinds 1980; de nationale concentratie
+van totale dominantie naar een vergelijkbare spreiding overal.
+
+Maar de rondes bewogen nooit *samen*. De ruwe correlatie tussen de
+afstanden van Giro en Tour is 0,565; na differencing om de gedeelde trend
+van een eeuw te verwijderen daalt die naar 0,160. Dat is onafhankelijke
+drift richting een gedeelde beperking — de UCI-reglementering — en geen
+coördinatie. Twee reeksen correleren die allebei een eeuw lang dalen zegt
+vrijwel niets tot je ze differentieert.
+
+Winnaars zijn over de hele geschiedenis 1,95 jaar ouder geworden:
+p = 0,0008 via permutatietest, r² = 0,038. Reëel, meetbaar en klein. Beide
+feiten worden gerapporteerd, want significantie en effectgrootte zijn
+verschillende vragen.
+
+## De bug die het onthouden waard is
+
+Wikipedia stelt dat acht renners alle drie de grote rondes gewonnen
+hebben. Mijn pijplijn gaf er zes. Het uitzoeken van dat verschil bracht
+twee bugs aan het licht: een vijfde annotatiesymbool dat alleen op de
+Vuelta-pagina voorkomt, en hertoegekende titels die als HTML gecodeerd
+zijn in plaats van als notatie — de Vuelta van 2011 leverde
+`"Juan José CoboChris Froome"` op, twee namen aan elkaar geplakt, omdat de
+naam van de geschrapte renner in een `<s>`-tag staat die `get_text()`
+platslaat. Opgelost door `decompose()` op doorstreepte elementen toe te
+passen vóór het uitlezen van de tekst.
+
+Zonder die externe controle had de dataset er volledig redelijk uitgezien:
+correcte aantallen rijen, plausibele waarden, geen fouten — en twee van de
+meest gedecoreerde renners misten stilletjes hun Vuelta-overwinningen.
+
+Dat is de methode die dit project me geleerd heeft: **valideer output
+tegen extern bekende feiten, niet alleen tegen de code.**
+
+## Open data
+
+De verwerkte datasets staan in de repository, zodat de analyse
+reproduceerbaar is zonder te scrapen of Wikidata te bevragen. De code is
+MIT; de data CC BY-SA 4.0, omdat de share-alike-voorwaarden van Wikipedia
+doorwerken in afgeleide werken en niet geherlicentieerd kunnen worden.

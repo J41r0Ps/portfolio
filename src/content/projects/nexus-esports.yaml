@@ -1,0 +1,56 @@
+# src/content/projects/nexus-esports.yaml
+#
+# Language-neutral FACTS about the project. Never contains prose.
+# The English/Dutch/Spanish copy lives in src/content/project-copy/{locale}/nexus-esports.mdx
+
+name: NEXUS Esports
+
+category: full-stack
+context: personal
+status: live
+
+year: 2026
+period: Jan – Jul 2026
+
+featured: true
+order: 1
+
+tech:
+  - C#
+  - ASP.NET Core
+  - Entity Framework Core
+  - AutoMapper
+  - SignalR
+  - Serilog
+  - Azure SQL
+  - React
+  - Vite
+  - Tailwind CSS
+  - React Router
+  - Axios
+  - Auth0
+  - Cloudinary
+  - Docker
+  - Azure
+  - GitHub Actions
+  - MSTest
+  - Moq
+
+topics:
+  - REST API
+  - Layered Architecture
+  - Repository Pattern
+  - Authentication
+  - Real-time
+  - Database Design
+  - Unit Testing
+  - CI/CD
+  - Cloud Deployment
+  - Containerisation
+  - Responsive Design
+
+links:
+  repo: https://github.com/J41r0Ps/nexus-esports
+  live: https://nexus-esports.example.com
+
+# cover: ../../assets/projects/nexus-cover.png   # add once the screenshot exists

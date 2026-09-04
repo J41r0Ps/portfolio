@@ -1,0 +1,102 @@
+---
+project: grand-tours-analysis
+locale: en
+
+title: Grand Tours Analysis — 120 years of professional cycling
+summary: >-
+  A full data pipeline over the Tour, Giro and Vuelta, from scraping to
+  statistics, with the cleaned datasets published as open data.
+
+role: Solo project
+
+coverAlt: Line chart comparing average winning speed across the three Grand Tours since 1903
+
+metrics:
+  - label: Race editions
+    value: "333"
+  - label: Riders
+    value: "161"
+  - label: Unit tests
+    value: "28"
+  - label: Wikidata match rate
+    value: 96.9%
+---
+
+## The problem
+
+The graded version of this project covered one race, forbade Pandas, and
+answered four questions from four disconnected files with no shared key.
+It met the brief. It was also the wrong shape for the question I actually
+wanted to ask: do the three Grand Tours behave like one sport, or three?
+
+So I rebuilt it. Three races instead of one, a proper relational model, a
+tested `src/` package, and the original preserved in `legacy/` as a
+deliberate before-and-after.
+
+## What I built
+
+Two tidy tables replacing four ad-hoc files: `editions` (333 rows, one per
+race-edition) and `riders` (161 rows, with per-race win counts), joined on
+a shared key.
+
+The three Wikipedia pages spell the same columns differently — `Sponsor/Team`,
+`Sponsor / team`, `Sponsor/team`. Rather than indexing by position, I
+normalise the headers and look them up in an alias table, so one function
+handles all three races and survives Wikipedia reordering its columns.
+
+Rider birth dates came from Wikidata over SPARQL in four batched requests,
+replacing roughly a hundred individual page scrapes. Names returning two
+distinct birth dates were excluded rather than guessed: picking one inserts
+a plausible wrong value that nothing downstream can detect.
+
+## The modelling decision that mattered most
+
+Editions needed four states, not a valid/invalid flag: `held` (294),
+`no_race` (23, the world wars), `disputed` (7, the annulled Tours of
+1999–2005) and `team_only` (1).
+
+Disputed editions have routes and distances, so they belong in
+route-level analysis — but they have no winner to credit. A binary flag
+forces a wrong answer to one of those two questions. Four states answer
+both correctly.
+
+## What the data says
+
+Convergence is the recurring pattern. Distance went from over 2,000 km
+apart in the 1920s to within roughly 200; speed from 4 km/h apart to
+within 2 since 1980; national concentration from total dominance to a
+similar spread everywhere.
+
+But the races never moved *together*. Raw Giro–Tour distance correlation
+is 0.565; after differencing to remove the shared century-long trend, it
+falls to 0.160. That is independent drift toward a shared constraint —
+UCI regulation — not coordination. Correlating two series that both
+decline over a century tells you almost nothing until you difference them.
+
+Winners have aged by 1.95 years across the whole history: p = 0.0008 by
+permutation test, r² = 0.038. Real, measurable, and small. Both facts get
+reported, because significance and effect size are different questions.
+
+## The bug worth remembering
+
+Wikipedia states that eight riders have won all three Grand Tours. My
+pipeline returned six. Chasing the gap exposed two bugs: a fifth
+annotation symbol used only on the Vuelta page, and reassigned titles
+encoded as HTML rather than notation — the 2011 Vuelta produced
+`"Juan José CoboChris Froome"`, two names glued together, because the
+stripped rider's name sits inside an `<s>` tag that `get_text()` flattens.
+Fixed by calling `decompose()` on struck elements before extracting text.
+
+Without that external check the dataset would have looked entirely
+reasonable: right row counts, plausible values, no errors raised, and two
+of the sport's most decorated riders silently missing their Vuelta wins.
+
+That is the method the project taught me: **validate outputs against
+externally known facts, not just against the code.**
+
+## Open data
+
+The processed datasets are published in the repository so the analysis can
+be reproduced without scraping or querying Wikidata. Code is MIT; the data
+is CC BY-SA 4.0, because Wikipedia's share-alike terms propagate to
+derived works and cannot be relicensed.

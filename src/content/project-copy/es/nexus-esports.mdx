@@ -1,0 +1,89 @@
+---
+project: nexus-esports
+locale: es
+
+title: NEXUS Esports — plataforma de torneos
+summary: >-
+  Plataforma full-stack de torneos de esports con actualizaciones de
+  partidas en vivo, poblada con datos competitivos reales de quince juegos.
+
+role: Proyecto individual
+
+coverAlt: Vista del cuadro de torneo de NEXUS Esports con marcadores en vivo
+
+metrics:
+  - label: Jugadores cargados
+    value: 500+
+  - label: Equipos
+    value: 90+
+  - label: Juegos cubiertos
+    value: "15"
+  - label: Pipelines CI/CD
+    value: "2"
+---
+
+## El problema
+
+Las herramientas para torneos de esports son o software empresarial con
+precio de empresa, o una hoja de cálculo. No hay nada intermedio para
+quien organiza un evento de fin de semana y aun así quiere cuadros en
+vivo, plantillas verificadas y una página pública de resultados.
+
+NEXUS ocupa ese espacio. Dos públicos — jugadores que gestionan sus
+plantillas y organizadores que gestionan eventos — en una sola plataforma
+donde cada lado hace más valioso al otro.
+
+## Qué construí
+
+Una API en .NET 10 repartida en cuatro proyectos con una dirección de
+referencias estricta: `API` depende de `Contracts`, `Domain` e
+`Infrastructure`; `Infrastructure` depende de `Domain`; `Contracts` y
+`Domain` no dependen de nada. Los controladores nunca tocan el
+`DbContext`: llaman a interfaces de repositorio y mapean a DTOs, de modo
+que ninguna entidad llega jamás al cliente y el ORM podría sustituirse sin
+modificar un solo controlador.
+
+Cada endpoint de colección filtra, busca y pagina, con un tope de tamaño
+de página del lado del servidor y los metadatos de paginación en una
+cabecera de respuesta propia, `X-Pagination`, en lugar de envolver el
+cuerpo.
+
+Las actualizaciones en vivo van por SignalR y se emiten tanto a un grupo
+por torneo como de forma global, para que quien mira un cuadro concreto y
+quien está en cualquier otra parte del sitio reciban la actualización
+correcta sin tener que suscribirse a todo.
+
+## Lo que lo hizo real
+
+Los datos inventados hacen que un proyecto de portafolio parezca
+justamente eso. NEXUS se puebla desde APIs reales — RAWG para juegos,
+PandaScore para equipos y jugadores competitivos, RestCountries para
+nacionalidades — mediante un controlador de carga restringido a
+administradores que ejecuta padres antes que hijos en un orden fijo.
+
+El realismo estuvo en decisiones pequeñas: filtrar los registros externos
+de jugadores por los que tienen foto de perfil, para que la plantilla sean
+nombres reconocibles y no ruido de base de datos; derivar salarios y
+número de partidas de curvas de rendimiento y edad en lugar de rangos
+aleatorios; usar nombres reales de torneos por juego.
+
+## Lo que me costó
+
+`UseHttpsRedirection` en producción rompía silenciosamente el health check
+de Azure, porque Azure termina el TLS en el balanceador y el contenedor
+nunca ve HTTPS. El contenedor se reiniciaba en bucle, sin ningún error que
+apuntara siquiera cerca de la causa.
+
+Las variables de entorno de Vite se resuelven en tiempo de build, no de
+ejecución, así que definirlas en Azure App Settings no hacía nada: tuvieron
+que pasar a secrets de GitHub Actions e inyectarse durante el workflow.
+
+Ambas son la misma lección con distinta ropa: saber en qué punto del ciclo
+de vida se resuelve un valor importa más que saber la sintaxis para
+definirlo.
+
+## Qué haría distinto
+
+Tests de integración con `WebApplicationFactory` desde el principio, no
+solo tests unitarios, y Tailwind desde el primer día — migrar 2.000 líneas
+de CSS escrito a mano llevó más tiempo que escribirlas.

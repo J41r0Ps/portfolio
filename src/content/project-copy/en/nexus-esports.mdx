@@ -1,0 +1,91 @@
+---
+# src/content/project-copy/en/nexus-esports.mdx
+#
+# Language-DEPENDENT copy. The filename must match the facts file in
+# src/content/projects/ — reference() enforces it at build time.
+
+project: nexus-esports
+locale: en
+
+title: NEXUS Esports — tournament platform
+summary: >-
+  A full-stack esports tournament platform with live match updates, seeded
+  from real competitive data across 15 games.
+
+role: Solo project
+
+coverAlt: The NEXUS Esports tournament bracket view, showing live match scores
+
+metrics:
+  - label: Players seeded
+    value: 500+
+  - label: Teams
+    value: 90+
+  - label: Games covered
+    value: "15"
+  - label: CI/CD pipelines
+    value: "2"
+---
+
+## The problem
+
+Esports tournament tooling is either enterprise software priced for
+organisations, or a spreadsheet. Nothing sits in between for a community
+organiser running a weekend event who still wants live brackets, verified
+rosters and a public results page.
+
+NEXUS is that middle. Two audiences — players managing rosters, and
+organisers running events — on one platform where each side makes the
+other more valuable.
+
+## What I built
+
+A .NET 10 API in four projects with a strict reference direction: `API`
+depends on `Contracts`, `Domain` and `Infrastructure`; `Infrastructure`
+depends on `Domain`; `Contracts` and `Domain` depend on nothing.
+Controllers never touch `DbContext` — they call repository interfaces and
+map to DTOs, so no entity ever reaches a client and the ORM could be
+swapped without a controller changing.
+
+Every collection endpoint filters, searches and pages, with a server-side
+page-size cap and pagination metadata in a custom `X-Pagination` response
+header rather than wrapped around the body.
+
+Live match updates run over SignalR, broadcasting both to a
+per-tournament group and globally, so a spectator watching one bracket
+and a user anywhere on the site get the right update without either
+subscribing to everything.
+
+## The part that made it real
+
+Fake data makes a portfolio project look like a portfolio project. NEXUS
+seeds from live APIs — RAWG for games, PandaScore for competitive teams
+and players, RestCountries for nationalities — through an admin-only
+seeding controller that runs parents before children in a fixed order.
+
+The realism came from small decisions: filtering external player records
+to those with a profile image, so the roster is recognisable names rather
+than database noise; deriving salaries and match counts from performance
+and age curves instead of random ranges; using real tournament names per
+game.
+
+## What it cost me
+
+`UseHttpsRedirection` in production silently broke the Azure health
+check, because Azure terminates TLS at the load balancer and the
+container never sees HTTPS. The container restarted in a loop with no
+error that pointed anywhere near the cause.
+
+Vite environment variables are read at build time, not run time, so
+setting them in Azure App Settings did nothing — they had to move to
+GitHub Actions secrets and be injected during the workflow.
+
+Both are the same lesson in different clothes: knowing where in the
+lifecycle a value is resolved matters more than knowing the syntax for
+setting it.
+
+## What I would do differently
+
+Integration tests with `WebApplicationFactory` from the start rather than
+unit tests alone, and Tailwind from day one — the migration away from
+2,000 lines of hand-written CSS took longer than writing the CSS did.

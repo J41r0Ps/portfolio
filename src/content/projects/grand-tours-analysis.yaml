@@ -1,0 +1,39 @@
+# src/content/projects/grand-tours-analysis.yaml
+
+name: Grand Tours Analysis
+
+category: data-science
+context: personal
+status: complete
+
+year: 2026
+period: 5 days
+
+featured: true
+order: 2
+
+tech:
+  - Python
+  - Requests
+  - BeautifulSoup
+  - Pandas
+  - NumPy
+  - Matplotlib
+  - Seaborn
+  - SPARQL
+  - pytest
+  - Jupyter
+  - Git
+
+topics:
+  - Web Scraping
+  - Data Cleaning
+  - Statistical Analysis
+  - Data Visualisation
+  - Open Data
+  - Unit Testing
+
+links:
+  repo: https://github.com/J41r0Ps/grand-tours-analysis
+
+# cover: ../../assets/projects/grand-tours-cover.png

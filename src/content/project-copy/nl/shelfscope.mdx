@@ -1,0 +1,88 @@
+---
+project: shelfscope
+locale: nl
+
+title: ShelfScope — een dataset vanaf nul opbouwen
+summary: >-
+  Een dataset van 1.000 boeken, gescraped, opgeschoond en volledig
+  geanalyseerd, die uiteindelijk bewees dat de brondata synthetisch was.
+
+role: Soloproject
+
+coverAlt: Histogram van voorraadniveaus met twee duidelijke clusters
+
+metrics:
+  - label: Boeken gescraped
+    value: "1.000"
+  - label: Pagina's opgehaald
+    value: "1.050"
+  - label: Bewijslijnen
+    value: "5"
+  - label: Betekenisloze labels
+    value: 22%
+---
+
+## Het probleem
+
+De meeste dataprojecten op cursusniveau starten met een kant-en-klare CSV,
+waardoor precies de twee fasen worden overgeslagen waar het echte werk
+zit. Dit project bouwt zijn eigen dataset, zodat Obtain en Scrub écht
+engineering zijn in plaats van één `read_csv`-oproep.
+
+## Wat ik gebouwd heb
+
+Scraping in twee passes: vijftig overzichtspagina's voor titel, prijs,
+score en beschikbaarheid, daarna alle duizend detailpagina's voor
+categorie, beschrijving, UPC, exacte voorraad en aantal reviews. Die
+tweede pass was nodig omdat categorie — de enige bruikbare categorische
+variabele — alleen in het kruimelpad van elk boek staat.
+
+De paginering volgt de `next`-link in plaats van `range(1, 51)` te
+doorlopen, zodat ze stopt op basis van de structuur van de site en niet op
+basis van een aanname. Elke aanvraag zit in een `try`/`except`, zodat één
+mislukking geen run van twintig minuten weggooit.
+
+De ontwerpregel was dat notebook 01 alleen ophaalt en verder niets. Elke
+waarde wordt exact opgeslagen zoals ze gescraped is — `£51.77`,
+`In stock (22 available)`, `Three` — vandaar de `_raw`-achtervoegsels bij
+de kolommen. Opschonen gebeurt in notebook 03. Zo draait de trage scrape
+één keer en kan de opschoonlogica vrij herschreven worden.
+
+## De vondst die ik niet verwachtte
+
+**De numerieke data is synthetisch, en vijf onafhankelijke bewijslijnen
+tonen dat aan.** De prijs is vlak over £10–£59,99 met een scheefheid van
+−0,037. De scores zijn bijna uniform verdeeld. Alle paarsgewijze
+correlaties vallen binnen ±0,03. Een permutatietest vindt geen effect van
+categorie op prijs (p = 0,977). Beide uitschietermethodes geven nul
+resultaten, omdat er geen staarten in de verdeling zitten om te vinden.
+
+"Er is hier geen effect" rapporteren als resultaat — in plaats van op zoek
+te gaan naar een verhaal — was de eerlijke keuze, en de nuttigste.
+
+## Waar de echte vondst zat
+
+In de categorische variabele. 22% van de boeken (219) valt in
+niet-genrecategorieën: `Default` (152) en `Add a comment` (67), dat
+laatste een UI-element dat als kruimelpad is meegescraped.
+
+Standaardcontroles op ontbrekende waarden missen dit volledig. De waarden
+zijn aanwezig, ze zijn alleen betekenisloos. `isna()` meldt een schone
+kolom. Alleen een frequentieranglijst legde het bloot.
+
+Voorraad was de enige variabele met echte structuur: multimodaal, met
+clusters rond 3 en 14–16 en een dunne band ertussen. De scheefheidsmaat
+(+0,212) leest als "licht rechtsscheef" en mist de multimodaliteit
+compleet — in één getal het argument om te plotten vóór je samenvat.
+
+## De bug die het onthouden waard is
+
+Twintig van de duizend detailpagina-aanvragen gaven 404's met een dubbel
+pad: `/catalogue/catalogue/...`. De `href` op een boektitel is relatief
+*ten opzichte van de pagina waar hij vandaan komt* — pagina 1 geeft
+`catalogue/book/index.html`, pagina's 2–50 geven
+`../../../catalogue/book/index.html`. Het strippen van de `../`-prefixen
+liet de eigen `catalogue/` van pagina 1 staan en plakte er nog een voor.
+
+Precies twintig fouten — de inhoud van één overzichtspagina — was de
+aanwijzing.

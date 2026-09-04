@@ -1,0 +1,90 @@
+---
+project: nexus-esports
+locale: nl
+
+title: NEXUS Esports — toernooiplatform
+summary: >-
+  Een full-stack esports-toernooiplatform met live wedstrijdupdates, gevuld
+  met echte competitieve data uit vijftien games.
+
+role: Soloproject
+
+coverAlt: De toernooibracket van NEXUS Esports met live wedstrijdscores
+
+metrics:
+  - label: Spelers ingeladen
+    value: 500+
+  - label: Teams
+    value: 90+
+  - label: Games
+    value: "15"
+  - label: CI/CD-pipelines
+    value: "2"
+---
+
+## Het probleem
+
+Software voor esports-toernooien is ofwel bedrijfssoftware met een
+bijbehorend prijskaartje, ofwel een spreadsheet. Daartussen bestaat er
+niets voor een organisator van een weekendevenement die toch live
+brackets, geverifieerde rosters en een publieke resultatenpagina wil.
+
+NEXUS vult dat gat. Twee doelgroepen — spelers die hun roster beheren en
+organisatoren die evenementen draaien — op één platform, waar elke kant
+de andere waardevoller maakt.
+
+## Wat ik gebouwd heb
+
+Een .NET 10-API in vier projecten met een strikte referentierichting:
+`API` verwijst naar `Contracts`, `Domain` en `Infrastructure`;
+`Infrastructure` naar `Domain`; `Contracts` en `Domain` naar niets.
+Controllers raken de `DbContext` nooit rechtstreeks aan — ze roepen
+repository-interfaces aan en mappen naar DTO's. Zo bereikt geen enkele
+entity ooit een client, en zou de ORM vervangen kunnen worden zonder één
+controller aan te passen.
+
+Elk collectie-endpoint filtert, zoekt en pagineert, met een server-side
+limiet op de paginagrootte en paginatiemetadata in een eigen
+`X-Pagination`-responseheader in plaats van rond de body.
+
+Live wedstrijdupdates lopen over SignalR en worden zowel naar een groep
+per toernooi als globaal uitgezonden, zodat een toeschouwer bij één
+bracket en een gebruiker elders op de site allebei de juiste update
+krijgen zonder zich op alles te moeten abonneren.
+
+## Wat het echt maakte
+
+Verzonnen data laat een portfolioproject eruitzien als een
+portfolioproject. NEXUS haalt zijn data uit echte API's — RAWG voor
+games, PandaScore voor competitieve teams en spelers, RestCountries voor
+nationaliteiten — via een seeding-controller die alleen voor beheerders
+toegankelijk is en die ouders vóór kinderen in een vaste volgorde
+uitvoert.
+
+Het realisme zat in kleine beslissingen: externe spelersrecords filteren
+op de aanwezigheid van een profielfoto, zodat de roster uit herkenbare
+namen bestaat in plaats van databaseruis; salarissen en wedstrijdaantallen
+afleiden uit prestatie- en leeftijdscurves in plaats van willekeurige
+getallen; echte toernooinamen per game gebruiken.
+
+## Wat het me gekost heeft
+
+`UseHttpsRedirection` in productie brak stilletjes de health check van
+Azure, omdat Azure TLS afhandelt bij de load balancer en de container dus
+nooit HTTPS ziet. De container herstartte in een lus, zonder enige fout
+die in de buurt van de oorzaak wees.
+
+Omgevingsvariabelen van Vite worden ingelezen tijdens de build, niet
+tijdens runtime. Ze instellen in Azure App Settings deed dus niets — ze
+moesten verhuizen naar GitHub Actions-secrets en tijdens de workflow
+geïnjecteerd worden.
+
+Allebei dezelfde les in een ander jasje: weten wáár in de levenscyclus een
+waarde wordt opgelost, is belangrijker dan weten hoe je hem instelt.
+
+## Wat ik anders zou doen
+
+Vanaf het begin integratietests met `WebApplicationFactory` in plaats van
+enkel unit tests, en Tailwind vanaf dag één — de migratie weg van
+2.000 regels handgeschreven CSS duurde langer dan het schrijven van die
+CSS zelf.

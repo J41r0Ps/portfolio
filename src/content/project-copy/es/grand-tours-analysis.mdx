@@ -1,0 +1,110 @@
+---
+project: grand-tours-analysis
+locale: es
+
+title: Grand Tours Analysis — 120 años de ciclismo profesional
+summary: >-
+  Un pipeline de datos completo sobre el Tour, el Giro y la Vuelta, del
+  scraping a la estadística, con los datasets limpios publicados como datos
+  abiertos.
+
+role: Proyecto individual
+
+coverAlt: Gráfico de líneas de la velocidad media ganadora en las tres grandes vueltas desde 1903
+
+metrics:
+  - label: Ediciones
+    value: "333"
+  - label: Corredores
+    value: "161"
+  - label: Tests unitarios
+    value: "28"
+  - label: Coincidencia Wikidata
+    value: 96,9%
+---
+
+## El problema
+
+La versión evaluada de este proyecto cubría una sola carrera, prohibía
+Pandas y respondía a cuatro preguntas con cuatro archivos inconexos sin
+clave compartida. Cumplía el enunciado, pero no tenía la forma adecuada
+para la pregunta que yo quería hacer: ¿se comportan las tres grandes
+vueltas como un solo deporte, o como tres?
+
+Así que lo reconstruí. Tres carreras en lugar de una, un modelo relacional
+de verdad, un paquete `src/` con tests, y el original conservado en
+`legacy/` como un antes y después deliberado.
+
+## Qué construí
+
+Dos tablas ordenadas sustituyen cuatro archivos improvisados: `editions`
+(333 filas, una por edición) y `riders` (161 filas, con victorias por
+carrera), unidas por una clave común.
+
+Las tres páginas de Wikipedia escriben las mismas columnas de forma
+distinta: `Sponsor/Team`, `Sponsor / team`, `Sponsor/team`. En lugar de
+indexar por posición, normalizo las cabeceras y las busco en una tabla de
+alias, de modo que una sola función sirve para las tres carreras y sigue
+funcionando si Wikipedia reordena sus columnas.
+
+Las fechas de nacimiento vinieron de Wikidata por SPARQL en cuatro
+peticiones agrupadas, sustituyendo un centenar de scrapes individuales.
+Los nombres que devolvían dos fechas distintas se excluyeron en vez de
+adivinarse: elegir una introduce un valor erróneo verosímil que ya no
+puede detectarse aguas abajo.
+
+## La decisión de modelado más importante
+
+Las ediciones necesitaban cuatro estados, no una bandera de válido o no:
+`held` (294), `no_race` (23, las guerras mundiales), `disputed` (7, los
+Tours anulados de 1999–2005) y `team_only` (1).
+
+Las ediciones anuladas tienen recorrido y distancia, así que pertenecen al
+análisis de rutas, pero no tienen ganador al que atribuir nada. Una
+bandera binaria obliga a dar una respuesta equivocada a una de esas dos
+preguntas. Cuatro estados responden bien a ambas.
+
+## Qué dicen los datos
+
+La convergencia es el patrón recurrente. La distancia pasó de más de
+2.000 km de diferencia en los años veinte a unos 200; la velocidad, de
+4 km/h de diferencia a menos de 2 desde 1980; la concentración nacional,
+del dominio absoluto a un reparto parecido en todas partes.
+
+Pero las carreras nunca se movieron *juntas*. La correlación bruta de
+distancia entre Giro y Tour es 0,565; tras aplicar differencing para
+eliminar la tendencia compartida de un siglo, baja a 0,160. Eso es deriva
+independiente hacia una restricción común — la normativa de la UCI — y no
+coordinación. Correlacionar dos series que llevan un siglo cayendo no dice
+casi nada hasta que se diferencian.
+
+Los ganadores han envejecido 1,95 años a lo largo de toda la historia:
+p = 0,0008 por test de permutación, r² = 0,038. Real, medible y pequeño.
+Se reportan ambos hechos, porque significancia y tamaño del efecto son
+preguntas distintas.
+
+## El bug que vale la pena recordar
+
+Wikipedia afirma que ocho corredores han ganado las tres grandes vueltas.
+Mi pipeline devolvía seis. Perseguir esa diferencia destapó dos errores:
+un quinto símbolo de anotación usado solo en la página de la Vuelta, y
+títulos reasignados codificados como HTML y no como notación — la Vuelta
+de 2011 producía `"Juan José CoboChris Froome"`, dos nombres pegados,
+porque el nombre del corredor sancionado está dentro de una etiqueta `<s>`
+que `get_text()` aplana. Se resolvió aplicando `decompose()` a los
+elementos tachados antes de extraer el texto.
+
+Sin esa comprobación externa, el dataset habría parecido perfectamente
+razonable: número de filas correcto, valores plausibles, ningún error — y
+dos de los ciclistas más laureados del deporte sin sus victorias en la
+Vuelta.
+
+Ese es el método que me enseñó este proyecto: **validar los resultados
+contra hechos conocidos externamente, no solo contra el código.**
+
+## Datos abiertos
+
+Los datasets procesados están publicados en el repositorio para que el
+análisis pueda reproducirse sin scraping ni consultas a Wikidata. El
+código es MIT; los datos, CC BY-SA 4.0, porque las condiciones share-alike
+de Wikipedia se propagan a las obras derivadas y no pueden relicenciarse.
