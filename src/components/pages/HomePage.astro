@@ -1,55 +1,242 @@
 ---
+/**
+ * HomePage.
+ *
+ * Ships zero JavaScript. Every number on this page is derived from the
+ * content collections at build time — nothing is hardcoded, so adding a
+ * project updates the stat strip, the skills section and the featured
+ * grid in all three languages at once.
+ */
 import BaseLayout from "@/layouts/BaseLayout.astro";
-import { useTranslations } from "@/i18n/utils";
-import type { Locale } from "@/i18n/config";
-import { getProjects, getProjectStats } from "@/lib/projects";
+import ProjectCard from "@/components/ProjectCard.astro";
+import Button from "@/components/ui/Button.astro";
+import Chip from "@/components/ui/Chip.astro";
+import SectionHeader from "@/components/ui/SectionHeader.astro";
+
+import { CV_FILES, type Locale } from "@/i18n/config";
+import { localizePath, useTranslations } from "@/i18n/utils";
+import { getFeaturedProjects, getProjectStats } from "@/lib/projects";
+import { getSkillGroups } from "@/lib/skills";
 
 interface Props {
   locale: Locale;
 }
 
-const { locale } = Astro.props;
+const { locale }: Props = Astro.props;
 const t = useTranslations(locale);
-const projects = await getProjects(locale);
-const stats = await getProjectStats(locale);
+
+const [featured, stats, skillGroups] = await Promise.all([
+  getFeaturedProjects(locale, 3),
+  getProjectStats(locale),
+  getSkillGroups(locale),
+]);
 ---
 
 <BaseLayout title={t("home.title")} description={t("home.meta.description")} locale={locale}>
-  <section class="hero-gradient min-h-screen">
-    <div class="container-page py-24">
-      <p class="font-mono text-sm tracking-widest text-accent uppercase">
-        {t("home.role")}
-      </p>
-      <h1 class="mt-6 font-display text-6xl font-bold text-text">
-        {t("home.title")}
-      </h1>
-      <p class="mt-4 max-w-xl text-lg text-text-muted">
-        {t("home.tagline")}
-      </p>
-      <p class="mt-12 font-mono text-sm text-text-muted">
-        {stats.projectCount} projects · {stats.techCount} technologies · {stats.latestYear}
-      </p>
+  {
+    /* ============================================================
+      01 — HERO
 
-      <ul class="mt-6 grid gap-4 md:grid-cols-2">
+      The right-hand box is the future home of the WebGL scene. It
+      gets its final dimensions NOW, filled with a static gradient,
+      so that mounting the canvas later changes nothing about the
+      layout. Reserving space after the fact is how sites end up
+      with content jumping half a second into the load.
+      ============================================================ */
+  }
+  <section class="hero-gradient relative overflow-hidden">
+    <div class="container-page grid items-center gap-12 py-15 lg:grid-cols-2 lg:gap-16 lg:py-10">
+      <div>
+        <p class="font-mono text-sm tracking-widest text-accent uppercase">
+          {t("home.role")}
+        </p>
+
+        <h1
+          class="mt-5 font-display text-5xl leading-[1.05] font-bold tracking-tight text-text sm:text-6xl xl:text-7xl"
+        >
+          {t("home.title")}
+        </h1>
+
+        <p class="mt-6 max-w-lg text-lg leading-relaxed text-text-muted">
+          {t("home.tagline")}
+        </p>
+
+        <div class="mt-9 flex flex-wrap items-center gap-3">
+          <Button href={localizePath("/projects", locale)}>
+            {t("home.hero.cta.work")}
+          </Button>
+          <Button href={localizePath("/contact", locale)} variant="secondary">
+            {t("home.hero.cta.contact")}
+          </Button>
+          <Button href={CV_FILES[locale]} download variant="ghost">
+            {t("cta.downloadCV")}
+          </Button>
+        </div>
+      </div>
+
+      {
+        /*
+        RESERVED CANVAS SLOT — Session 13.
+        aspect-square + max-w keeps the box identical before and after
+        the scene exists. `aria-hidden` because it is decoration: a
+        screen reader gains nothing from being told there is a gradient.
+      */
+      }
+      <div
+        id="hero-visual"
+        aria-hidden="true"
+        class="relative mx-auto aspect-square w-full max-w-md
+               rounded-2xl border border-border
+               bg-linear-to-br from-accent/10 via-transparent to-accent/5
+               lg:max-w-lg"
+      >
+        <div
+          class="absolute inset-0 rounded-2xl
+                 bg-[radial-gradient(circle_at_50%_40%,var(--accent),transparent_65%)]
+                 opacity-[0.18]"
+        >
+        </div>
+      </div>
+    </div>
+  </section>
+
+  {
+    /* ============================================================
+      STAT STRIP — derived, never typed by hand
+      ============================================================ */
+  }
+  <section class="border-y border-border bg-surface-sunken">
+    <div class="container-page grid grid-cols-3 divide-x divide-border">
+      <div class="py-6 pr-4">
+        <p class="font-display text-3xl font-bold text-text">{stats.projectCount}</p>
+        <p class="mt-1 font-mono text-xs tracking-wide text-text-muted uppercase">
+          {t("home.stats.projects")}
+        </p>
+      </div>
+      <div class="py-6 pl-4 pr-4 sm:pl-6">
+        <p class="font-display text-3xl font-bold text-text">{stats.techCount}</p>
+        <p class="mt-1 font-mono text-xs tracking-wide text-text-muted uppercase">
+          {t("home.stats.technologies")}
+        </p>
+      </div>
+      <div class="py-6 pl-4 sm:pl-6">
+        <p class="font-display text-3xl font-bold text-text">{stats.latestYear}</p>
+        <p class="mt-1 font-mono text-xs tracking-wide text-text-muted uppercase">
+          {t("home.stats.latest")}
+        </p>
+      </div>
+    </div>
+  </section>
+
+  {
+    /* ============================================================
+      02 — SELECTED WORK
+      ============================================================ */
+  }
+  <section class="container-page py-20 sm:py-28">
+    <SectionHeader
+      number={2}
+      title={t("home.featured.title")}
+      subtitle={t("home.featured.subtitle")}
+    />
+
+    <ul class="mt-10 grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
+      {
+        featured.map((project) => (
+          <li class="flex">
+            <ProjectCard project={project} locale={locale} as="h3" />
+          </li>
+        ))
+      }
+    </ul>
+
+    <div class="mt-10">
+      <Button href={localizePath("/projects", locale)} variant="secondary">
+        {t("cta.viewAll")}
+      </Button>
+    </div>
+  </section>
+
+  {
+    /* ============================================================
+      03 — SKILLS
+
+      Grouped, derived from project content. A technology cannot
+      appear here without a project behind it.
+      ============================================================ */
+  }
+  <section class="border-t border-border bg-surface-sunken">
+    <div class="container-page py-20 sm:py-28">
+      <SectionHeader
+        number={3}
+        title={t("home.skills.title")}
+        subtitle={t("home.skills.subtitle")}
+      />
+
+      <div class="mt-10 grid gap-8 sm:grid-cols-2 lg:grid-cols-4">
         {
-          projects.map((project) => (
-            <li class="rounded-lg border border-border bg-surface-raised p-5">
-              <p class="font-mono text-xs text-text-muted">
-                {project.year} · {project.category}
-              </p>
-              <h2 class="mt-2 font-display text-xl font-bold text-text">{project.title}</h2>
-              <p class="mt-2 text-sm text-text-muted">{project.summary}</p>
-              <ul class="mt-3 flex flex-wrap gap-1.5">
-                {project.tech.slice(0, 6).map((tech) => (
-                  <li class="rounded border border-border px-2 py-0.5 font-mono text-[11px] text-text-muted">
-                    {tech}
+          skillGroups.map((group) => (
+            <div>
+              <h3 class="font-mono text-xs tracking-widest text-accent uppercase">{group.group}</h3>
+              <ul class="mt-4 flex flex-wrap gap-1.5">
+                {group.items.map((item) => (
+                  <li>
+                    <Chip count={item.count > 1 ? item.count : undefined}>{item.value}</Chip>
                   </li>
                 ))}
               </ul>
-            </li>
+            </div>
           ))
         }
-      </ul>
+      </div>
+    </div>
+  </section>
+
+  {
+    /* ============================================================
+      04 — ABOUT TEASER
+      ============================================================ */
+  }
+  <section class="container-page py-20 sm:py-28">
+    <div class="grid gap-8 lg:grid-cols-[1fr_1.4fr] lg:gap-16">
+      <SectionHeader number={4} title={t("home.about.title")} />
+
+      <div>
+        <p class="text-lg leading-relaxed text-text-muted">
+          {t("home.about.body")}
+        </p>
+        <div class="mt-7">
+          <Button href={localizePath("/about", locale)} variant="secondary">
+            {t("home.about.cta")}
+          </Button>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  {
+    /* ============================================================
+      05 — CONTACT CTA
+      ============================================================ */
+  }
+  <section class="border-t border-border">
+    <div class="hero-gradient">
+      <div class="container-page py-20 text-center sm:py-28">
+        <h2 class="font-display text-3xl font-bold tracking-tight text-text sm:text-4xl">
+          {t("home.contact.title")}
+        </h2>
+        <p class="mx-auto mt-4 max-w-xl text-text-muted">
+          {t("home.contact.body")}
+        </p>
+        <div class="mt-8 flex flex-wrap justify-center gap-3">
+          <Button href={localizePath("/contact", locale)}>
+            {t("cta.getInTouch")}
+          </Button>
+          <Button href={CV_FILES[locale]} download variant="secondary">
+            {t("cta.downloadCV")}
+          </Button>
+        </div>
+      </div>
     </div>
   </section>
 </BaseLayout>

@@ -1,0 +1,104 @@
+---
+/**
+ * ProjectCard — one project, summarised.
+ *
+ * Used on the homepage and the projects index. Built once so the two
+ * never drift apart.
+ *
+ * `data-*` attributes carry the tags into the DOM. The filter island in
+ * Session 10 reads them to decide what to show, which is what lets every
+ * card stay in the static HTML while filtering still feels instant.
+ */
+import { Image } from 'astro:assets';
+
+import type { Locale } from '@/i18n/config';
+import { localizePath } from '@/i18n/utils';
+import type { Project } from '@/lib/projects';
+import Chip from '@/components/ui/Chip.astro';
+
+interface Props {
+  project: Project;
+  locale: Locale;
+  /**
+   * Heading level. The card sits under different headings on different
+   * pages, and skipping levels breaks screen-reader navigation.
+   */
+  as?: 'h2' | 'h3';
+  /** Chips shown before collapsing into "+N". */
+  maxTech?: number;
+}
+
+const { project, locale, as: Tag = 'h3', maxTech = 5 }: Props = Astro.props;
+
+const href = localizePath(`/projects/${project.slug}`, locale);
+
+const visibleTech = project.tech.slice(0, maxTech);
+const hiddenCount = project.tech.length - visibleTech.length;
+---
+
+<article
+  data-project
+  data-category={project.category}
+  data-tech={project.tech.join('|')}
+  data-topics={project.topics.join('|')}
+  data-year={project.year}
+  class="group relative flex flex-col overflow-hidden rounded-xl border
+         border-border bg-surface-raised transition-colors
+         hover:border-accent"
+>
+  {
+    project.cover && (
+      <div class="aspect-[16/9] overflow-hidden bg-surface-sunken">
+        <Image
+          src={project.cover}
+          alt={project.coverAlt ?? ''}
+          widths={[400, 800]}
+          sizes="(min-width: 768px) 400px, 100vw"
+          class="h-full w-full object-cover"
+          loading="lazy"
+        />
+      </div>
+    )
+  }
+
+  <div class="flex flex-1 flex-col p-5">
+    <p class="font-mono text-xs text-text-muted">
+      {project.year}
+      {project.period && <span> · {project.period}</span>}
+    </p>
+
+    <Tag class="mt-2 font-display text-lg font-bold text-text">
+      {/*
+        The stretched-link pattern: the <a> is a normal link for
+        keyboard and screen-reader users, and its ::after covers the
+        whole card so a mouse click anywhere works. Wrapping the entire
+        card in an anchor instead would make the screen reader read
+        every chip and paragraph as part of the link text.
+      */}
+      <a href={href} class="after:absolute after:inset-0 after:content-['']">
+        {project.title}
+      </a>
+    </Tag>
+
+    <p class="mt-2 flex-1 text-sm leading-relaxed text-text-muted">
+      {project.summary}
+    </p>
+
+    <ul class="mt-4 flex flex-wrap gap-1.5">
+      {
+        visibleTech.map((tech) => (
+          <li>
+            <Chip>{tech}</Chip>
+          </li>
+        ))
+      }
+      {
+        hiddenCount > 0 && (
+          <li>
+            <Chip>+{hiddenCount}</Chip>
+          </li>
+        )
+      }
+    </ul>
+  </div>
+</article>

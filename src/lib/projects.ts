@@ -11,10 +11,10 @@
  * don't.
  */
 
-import { getCollection, getEntry, type CollectionEntry } from 'astro:content';
+import { getCollection, getEntry, type CollectionEntry } from "astro:content";
 
-import type { Locale } from '@/i18n/config';
-import type { Category, Tech, Topic } from './taxonomy';
+import type { Locale } from "@/i18n/config";
+import type { Category, Tech, Topic } from "./taxonomy";
 
 /** A project's facts merged with its copy in one locale. */
 export interface Project {
@@ -24,16 +24,16 @@ export interface Project {
   // --- facts ---
   name: string;
   category: Category;
-  context: CollectionEntry<'projects'>['data']['context'];
-  status: CollectionEntry<'projects'>['data']['status'];
+  context: CollectionEntry<"projects">["data"]["context"];
+  status: CollectionEntry<"projects">["data"]["status"];
   year: number;
   period?: string;
   tech: readonly Tech[];
   topics: readonly Topic[];
   featured: boolean;
   order: number;
-  links: CollectionEntry<'projects'>['data']['links'];
-  cover?: CollectionEntry<'projects'>['data']['cover'];
+  links: CollectionEntry<"projects">["data"]["links"];
+  cover?: CollectionEntry<"projects">["data"]["cover"];
 
   // --- copy ---
   title: string;
@@ -43,7 +43,7 @@ export interface Project {
   metrics?: Array<{ label: string; value: string }>;
 
   /** The raw copy entry, kept so a page can call render() on its body. */
-  entry: CollectionEntry<'projectCopy'>;
+  entry: CollectionEntry<"projectCopy">;
 }
 
 /**
@@ -53,7 +53,7 @@ export interface Project {
  * locale) and never in a browser.
  */
 export async function getProjects(locale: Locale): Promise<Project[]> {
-  const copies = await getCollection('projectCopy', ({ data }) => data.locale === locale);
+  const copies = await getCollection("projectCopy", ({ data }) => data.locale === locale);
 
   const projects = await Promise.all(
     copies.map(async (copy) => {
@@ -92,10 +92,7 @@ export async function getFeaturedProjects(locale: Locale, limit = 3): Promise<Pr
 }
 
 /** One project by slug, or undefined. */
-export async function getProject(
-  slug: string,
-  locale: Locale,
-): Promise<Project | undefined> {
+export async function getProject(slug: string, locale: Locale): Promise<Project | undefined> {
   const projects = await getProjects(locale);
   return projects.find((p) => p.slug === slug);
 }

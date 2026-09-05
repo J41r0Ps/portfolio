@@ -73,6 +73,29 @@ export const en = {
   "error.404.title": "Page not found",
   "error.404.body": "That page does not exist. It may have moved.",
   "error.404.back": "Back to home",
+
+  // --- home sections ---
+  "home.hero.cta.work": "View my work",
+  "home.hero.cta.contact": "Get in touch",
+
+  "home.stats.projects": "Projects",
+  "home.stats.technologies": "Technologies",
+  "home.stats.latest": "Latest",
+
+  "home.featured.title": "Selected work",
+  "home.featured.subtitle": "Three projects that show how I build, test and ship.",
+
+  "home.skills.title": "What I work with",
+  "home.skills.subtitle": "Technologies used in shipped projects, not a wishlist.",
+
+  "home.about.title": "About me",
+  "home.about.body":
+    "Third-year Applied Computer Science student in Belgium, originally from Peru. I care about understanding why a pattern exists before using it, and about validating what I build against something outside my own code.",
+  "home.about.cta": "More about me",
+
+  "home.contact.title": "Open to internships",
+  "home.contact.body":
+    "Looking for a full-stack or backend internship. If that sounds like a fit, I would like to hear from you.",
 } satisfies Record<string, string>;
 
 /**
@@ -121,6 +144,28 @@ export const nl: Dictionary = {
   "error.404.title": "Pagina niet gevonden",
   "error.404.body": "Deze pagina bestaat niet. Mogelijk is ze verplaatst.",
   "error.404.back": "Terug naar home",
+
+  "home.hero.cta.work": "Bekijk mijn werk",
+  "home.hero.cta.contact": "Neem contact op",
+
+  "home.stats.projects": "Projecten",
+  "home.stats.technologies": "Technologieën",
+  "home.stats.latest": "Recentste",
+
+  "home.featured.title": "Geselecteerd werk",
+  "home.featured.subtitle": "Drie projecten die tonen hoe ik bouw, test en uitrol.",
+
+  "home.skills.title": "Waar ik mee werk",
+  "home.skills.subtitle": "Technologieën uit opgeleverde projecten, geen verlanglijst.",
+
+  "home.about.title": "Over mij",
+  "home.about.body":
+    "Derdejaarsstudent Toegepaste Informatica in België, oorspronkelijk uit Peru. Ik wil begrijpen waarom een patroon bestaat voordat ik het gebruik, en ik valideer wat ik bouw tegen iets buiten mijn eigen code.",
+  "home.about.cta": "Meer over mij",
+
+  "home.contact.title": "Op zoek naar een stage",
+  "home.contact.body":
+    "Ik zoek een stage in full-stack of backend development. Als dat past, hoor ik het graag.",
 };
 
 export const es: Dictionary = {
@@ -162,6 +207,28 @@ export const es: Dictionary = {
   "error.404.title": "Página no encontrada",
   "error.404.body": "Esta página no existe. Puede que se haya movido.",
   "error.404.back": "Volver al inicio",
+
+  "home.hero.cta.work": "Ver mi trabajo",
+  "home.hero.cta.contact": "Contáctame",
+
+  "home.stats.projects": "Proyectos",
+  "home.stats.technologies": "Tecnologías",
+  "home.stats.latest": "Más reciente",
+
+  "home.featured.title": "Trabajo seleccionado",
+  "home.featured.subtitle": "Tres proyectos que muestran cómo construyo, pruebo y despliego.",
+
+  "home.skills.title": "Con qué trabajo",
+  "home.skills.subtitle": "Tecnologías usadas en proyectos entregados, no una lista de deseos.",
+
+  "home.about.title": "Sobre mí",
+  "home.about.body":
+    "Estudiante de tercer año de Informática Aplicada en Bélgica, originario de Perú. Me importa entender por qué existe un patrón antes de usarlo, y validar lo que construyo contra algo externo a mi propio código.",
+  "home.about.cta": "Más sobre mí",
+
+  "home.contact.title": "Disponible para prácticas",
+  "home.contact.body":
+    "Busco unas prácticas en desarrollo full-stack o backend. Si encaja, me gustaría saber de ti.",
 };
 
 export const ui: Record<Locale, Dictionary> = { en, nl, es };

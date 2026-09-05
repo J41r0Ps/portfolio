@@ -9,7 +9,7 @@ status: complete
 year: 2026
 period: 5 days
 
-featured: false
+featured: true
 order: 3
 
 tech:

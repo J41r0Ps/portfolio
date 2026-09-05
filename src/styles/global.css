@@ -21,37 +21,37 @@
    directly; use the semantic tokens below.
    ================================================================== */
 @theme {
-    /* --- pine: dark surfaces, never pure black --- */
-    --color-pine-950: #080b0c;
-    --color-pine-900: #0c1113;
-    --color-pine-850: #101619;
-    --color-pine-800: #151d20;
+  /* --- pine: dark surfaces, never pure black --- */
+  --color-pine-950: #080b0c;
+  --color-pine-900: #0c1113;
+  --color-pine-850: #101619;
+  --color-pine-800: #151d20;
 
-    /* --- sage: the single accent family --- */
-    --color-sage-300: #9ec8b5;
-    --color-sage-500: #52796f;
-    --color-sage-700: #3a564e;
+  /* --- sage: the single accent family --- */
+  --color-sage-300: #9ec8b5;
+  --color-sage-500: #52796f;
+  --color-sage-700: #3a564e;
 
-    /* --- mist: light surfaces and text, same hue family --- */
-    --color-mist-50: #f6f7f5;
-    --color-mist-100: #e7ebe6;
-    --color-mist-200: #f4f6f4;
-    --color-mist-400: #aebcb2;
-    --color-mist-600: #5c6b64;
-    --color-mist-900: #1d2a27;
+  /* --- mist: light surfaces and text, same hue family --- */
+  --color-mist-50: #f6f7f5;
+  --color-mist-100: #e7ebe6;
+  --color-mist-200: #f4f6f4;
+  --color-mist-400: #aebcb2;
+  --color-mist-600: #5c6b64;
+  --color-mist-900: #1d2a27;
 
-    /* --- typography --- */
-    --font-sans: "Geist", ui-sans-serif, system-ui, sans-serif;
-    --font-display: "Space Grotesk", "Geist", ui-sans-serif, sans-serif;
-    --font-mono: "Geist Mono", ui-monospace, SFMono-Regular, monospace;
+  /* --- typography --- */
+  --font-sans: "Geist", ui-sans-serif, system-ui, sans-serif;
+  --font-display: "Space Grotesk", "Geist", ui-sans-serif, sans-serif;
+  --font-mono: "Geist Mono", ui-monospace, SFMono-Regular, monospace;
 
-    /* --- extra breakpoint carried over from v1 --- */
-    --breakpoint-xs: 450px;
+  /* --- extra breakpoint carried over from v1 --- */
+  --breakpoint-xs: 450px;
 
-    /* --- shadows: tinted, never neutral grey --- */
-    --shadow-card: 0 20px 60px -20px rgb(12 20 18 / 0.35);
-    --shadow-card-light: 0 16px 40px -16px rgb(46 74 66 / 0.18);
-    --shadow-glow: 0 0 40px -8px rgb(82 121 111 / 0.45);
+  /* --- shadows: tinted, never neutral grey --- */
+  --shadow-card: 0 20px 60px -20px rgb(12 20 18 / 0.35);
+  --shadow-card-light: 0 16px 40px -16px rgb(46 74 66 / 0.18);
+  --shadow-glow: 0 0 40px -8px rgb(82 121 111 / 0.45);
 }
 
 /* ==================================================================
@@ -61,123 +61,123 @@
    component ever needs a `dark:` variant for colour.
    ================================================================== */
 :root {
-    /* light theme is the default */
-    --surface: var(--color-mist-50);
-    --surface-raised: #ffffff;
-    --surface-sunken: var(--color-mist-100);
+  /* light theme is the default */
+  --surface: var(--color-mist-50);
+  --surface-raised: #ffffff;
+  --surface-sunken: var(--color-mist-100);
 
-    --text: var(--color-mist-900);
-    --text-muted: var(--color-mist-600);
+  --text: var(--color-mist-900);
+  --text-muted: var(--color-mist-600);
 
-    --accent: var(--color-sage-500);
-    --accent-hover: var(--color-sage-700);
-    --on-accent: var(--color-mist-50);
+  --accent: var(--color-sage-500);
+  --accent-hover: var(--color-sage-700);
+  --on-accent: var(--color-mist-50);
 
-    --border: rgb(29 42 39 / 0.12);
-    --border-strong: rgb(29 42 39 / 0.22);
+  --border: rgb(29 42 39 / 0.12);
+  --border-strong: rgb(29 42 39 / 0.22);
 
-    --shadow-ambient: var(--shadow-card-light);
+  --shadow-ambient: var(--shadow-card-light);
 
-    color-scheme: light;
+  color-scheme: light;
 }
 
 .dark {
-    --surface: var(--color-pine-850);
-    --surface-raised: var(--color-pine-800);
-    --surface-sunken: var(--color-pine-900);
+  --surface: var(--color-pine-850);
+  --surface-raised: var(--color-pine-800);
+  --surface-sunken: var(--color-pine-900);
 
-    --text: var(--color-mist-200);
-    --text-muted: var(--color-mist-400);
+  --text: var(--color-mist-200);
+  --text-muted: var(--color-mist-400);
 
-    /* sage-500 fails contrast on a dark surface — sage-300 is the
+  /* sage-500 fails contrast on a dark surface — sage-300 is the
      reason the original config had a separate `accent-bright`.
      Here the switch is automatic. */
-    --accent: var(--color-sage-300);
-    --accent-hover: #b8d9ca;
-    --on-accent: var(--color-pine-950);
+  --accent: var(--color-sage-300);
+  --accent-hover: #b8d9ca;
+  --on-accent: var(--color-pine-950);
 
-    --border: rgb(244 246 244 / 0.10);
-    --border-strong: rgb(244 246 244 / 0.18);
+  --border: rgb(244 246 244 / 0.1);
+  --border-strong: rgb(244 246 244 / 0.18);
 
-    --shadow-ambient: var(--shadow-card);
+  --shadow-ambient: var(--shadow-card);
 
-    color-scheme: dark;
+  color-scheme: dark;
 }
 
 /* `inline` keeps the var() reference instead of copying the value.
    Without it these would be frozen at build time and the theme
    toggle would do nothing. */
 @theme inline {
-    --color-surface: var(--surface);
-    --color-surface-raised: var(--surface-raised);
-    --color-surface-sunken: var(--surface-sunken);
+  --color-surface: var(--surface);
+  --color-surface-raised: var(--surface-raised);
+  --color-surface-sunken: var(--surface-sunken);
 
-    --color-text: var(--text);
-    --color-text-muted: var(--text-muted);
+  --color-text: var(--text);
+  --color-text-muted: var(--text-muted);
 
-    --color-accent: var(--accent);
-    --color-accent-hover: var(--accent-hover);
-    --color-on-accent: var(--on-accent);
+  --color-accent: var(--accent);
+  --color-accent-hover: var(--accent-hover);
+  --color-on-accent: var(--on-accent);
 
-    --color-border: var(--border);
-    --color-border-strong: var(--border-strong);
+  --color-border: var(--border);
+  --color-border-strong: var(--border-strong);
 }
 
 /* ==================================================================
    BASE
    ================================================================== */
 @layer base {
-    html {
-        scroll-behavior: smooth;
-    }
+  html {
+    scroll-behavior: smooth;
+  }
 
-    /* Never smooth-scroll someone who asked for reduced motion —
+  /* Never smooth-scroll someone who asked for reduced motion —
      it can trigger vestibular symptoms. */
-    @media (prefers-reduced-motion: reduce) {
-        html {
-            scroll-behavior: auto;
-        }
-
-        *,
-        *::before,
-        *::after {
-            animation-duration: 0.01ms !important;
-            animation-iteration-count: 1 !important;
-            transition-duration: 0.01ms !important;
-        }
+  @media (prefers-reduced-motion: reduce) {
+    html {
+      scroll-behavior: auto;
     }
 
-    body {
-        background-color: var(--surface);
-        color: var(--text);
-        font-family: var(--font-sans);
-        -webkit-font-smoothing: antialiased;
-        text-rendering: optimizeLegibility;
+    *,
+    *::before,
+    *::after {
+      animation-duration: 0.01ms !important;
+      animation-iteration-count: 1 !important;
+      transition-duration: 0.01ms !important;
     }
+  }
 
-    h1,
-    h2,
-    h3,
-    h4 {
-        font-family: var(--font-display);
-        text-wrap: balance;
-    }
+  body {
+    background-color: var(--surface);
+    color: var(--text);
+    font-family: var(--font-sans);
+    -webkit-font-smoothing: antialiased;
+    text-rendering: optimizeLegibility;
+  }
 
-    p {
-        text-wrap: pretty;
-    }
+  h1,
+  h2,
+  h3,
+  h4 {
+    font-family: var(--font-display);
+    text-wrap: balance;
+  }
 
-    /* One visible, consistent focus ring everywhere. */
-    :focus-visible {
-        outline: 2px solid var(--accent);
-        outline-offset: 2px;
-        border-radius: 2px;
-    }
+  p {
+    text-wrap: pretty;
+  }
 
-    ::selection {
-        background-color: var(--accent);
-        color: var(--on-accent);
-    }
+  /* One visible, consistent focus ring everywhere. */
+  :focus-visible {
+    outline: 2px solid var(--accent);
+    outline-offset: 2px;
+    border-radius: 2px;
+  }
+
+  ::selection {
+    background-color: var(--accent);
+    color: var(--on-accent);
+  }
 }
 
 /* ==================================================================
@@ -187,21 +187,21 @@
 /* The layered radial gradients behind the hero, carried over from v1
    but theme-aware: one class, correct in both modes. */
 @utility hero-gradient {
-    background-image:
-        radial-gradient(ellipse 70% 55% at 75% 15%, rgb(82 121 111 / 0.16), transparent 70%),
-        radial-gradient(ellipse 55% 45% at 15% 85%, rgb(202 210 197 / 0.45), transparent 70%);
+  background-image:
+    radial-gradient(ellipse 70% 55% at 75% 15%, rgb(82 121 111 / 0.16), transparent 70%),
+    radial-gradient(ellipse 55% 45% at 15% 85%, rgb(202 210 197 / 0.45), transparent 70%);
 }
 
 .dark .hero-gradient {
-    background-image:
-        radial-gradient(ellipse 70% 55% at 75% 15%, rgb(82 121 111 / 0.22), transparent 70%),
-        radial-gradient(ellipse 55% 45% at 15% 85%, rgb(82 121 111 / 0.12), transparent 70%);
+  background-image:
+    radial-gradient(ellipse 70% 55% at 75% 15%, rgb(82 121 111 / 0.22), transparent 70%),
+    radial-gradient(ellipse 55% 45% at 15% 85%, rgb(82 121 111 / 0.12), transparent 70%);
 }
 
 /* Content width, so sections don't each invent their own. */
 @utility container-page {
-    width: 100%;
-    max-width: 72rem;
-    margin-inline: auto;
-    padding-inline: 1.25rem;
+  width: 100%;
+  max-width: 72rem;
+  margin-inline: auto;
+  padding-inline: 1.25rem;
 }
