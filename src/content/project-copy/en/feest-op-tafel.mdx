@@ -1,0 +1,89 @@
+---
+project: feest-op-tafel
+locale: en
+
+title: Feest op Tafel — dessert ordering for a real client
+summary: >-
+  A Laravel ordering and catering platform built for a live client by a
+  team of five, delivered in Scrum and deployed to production.
+
+role: Team of 5 — catering module, ingredient management, admin analytics
+
+coverAlt: The Feest op Tafel customer dashboard showing desserts and orders
+
+metrics:
+  - label: Team size
+    value: "5"
+  - label: Sprint methodology
+    value: Scrum
+  - label: Status
+    value: In production
+---
+
+## The brief
+
+Kathleen Renders runs a dessert and catering business and was managing
+orders, workshop registrations and shopping lists by hand. Skills
+Integration Lab paired her with our team of five as a real client — she
+set the requirements, we ran the sprints, and she used what we delivered.
+
+The result is a Laravel application where customers order desserts, claim
+discounted surplus stock, register for workshops and submit catering
+requests, and where the owner manages the entire catalogue and reads
+sales analytics.
+
+Working with a non-technical client changed how requirements arrived.
+"I want to know what I need to buy this week" is not a specification —
+turning it into the shopping-list generator meant asking what she
+actually did on a Monday morning, not what she thought a system should
+do.
+
+## What I built
+
+The project was split across the team; these are the parts I owned.
+
+**Catering requests, end to end.** Customers submit a request with event
+type, date, guest count, budget and a package. They can pick specific
+desserts as preferences, seeing portion sizes and package surcharges as
+they choose. Themes come from a list or are typed in freely and added on
+the fly — the client's business genuinely has an open set of themes, and
+forcing a fixed dropdown would have made the feature useless to her. The
+whole confirmation mail flow is automated from the submitted request.
+
+**Ingredient management.** A full CRUD system for ingredients, including
+the logic that links allergens to ingredients. Allergens propagate up:
+because a dessert is made of ingredients, its allergen list is derived
+rather than maintained separately, which means it cannot go stale when a
+recipe changes.
+
+**Admin analytics.** A price-evolution page for the admin dashboard, with
+interactive Chart.js visualisations of price and order data over time,
+and a toggle between chart and table views. The table view exists because
+the client asked for it — she wanted the numbers, not only the shape.
+
+**Login**, front end and backend.
+
+**Codebase architecture.** Late in the project I restructured the folder
+layout into meaningful domains — `Admin/Catalog`, `Frontend/Checkout` and
+so on — and normalised naming conventions across routes, filenames and
+Livewire components. Five people had each been naming things reasonably
+and differently, and by then finding a component meant guessing which
+convention its author had used.
+
+## What working in a team taught me
+
+Refactoring someone else's naming is a social problem before it is a
+technical one. Doing it in one pass, with the reasoning written down and
+agreed first, worked. Doing it gradually would have produced merge
+conflicts and the impression I was quietly rewriting other people's work.
+
+Scrum with Jira, Clockify time tracking and burndown charts was the first
+time I saw estimation feedback: you commit to a sprint, you miss, and the
+chart tells you exactly how wrong you were. That is a more useful
+correction than any amount of advice about estimating.
+
+## Stack
+
+Laravel with Livewire and Blade, Alpine.js for client-side interaction,
+Tailwind for styling, MySQL, Stripe for payments, and nightly automated
+deployment to Combell through a GitHub Actions workflow.

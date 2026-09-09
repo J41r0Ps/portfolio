@@ -1,0 +1,40 @@
+# src/content/projects/feest-op-tafel.yaml
+
+name: Feest op Tafel
+
+category: full-stack
+context: group # team of five — the copy scopes my own contribution
+status: live
+
+year: 2026
+period: "Feb – Jun 2026"
+
+featured: true
+order: 2
+
+tech:
+  - PHP
+  - Laravel
+  - Livewire
+  - Blade
+  - Alpine.js
+  - Tailwind CSS
+  - JavaScript
+  - MySQL
+  - Chart.js
+  - Stripe
+  - Git
+  - GitHub Actions
+
+topics:
+  - Database Design
+  - Authentication
+  - Payment Integration
+  - Data Visualisation
+  - Refactoring
+  - Agile / Scrum
+  - Client Collaboration
+  - Responsive Design
+
+links:
+  live: https://krea.feestoptafel.be/

@@ -7,10 +7,10 @@ context: personal
 status: complete
 
 year: 2026
-period: 5 days
+period: Aug – Sep 2026
 
 featured: true
-order: 3
+order: 4
 
 tech:
   - Python

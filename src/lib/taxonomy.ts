@@ -19,12 +19,12 @@
    CATEGORY — exactly one per project. The top-level view.
    ================================================================== */
 export const CATEGORIES = [
-  'full-stack',
-  'backend',
-  'frontend',
-  'data-science',
-  'ai-ml',
-  'devops',
+  "full-stack",
+  "backend",
+  "frontend",
+  "data-science",
+  "ai-ml",
+  "devops",
 ] as const;
 
 export type Category = (typeof CATEGORIES)[number];
@@ -37,13 +37,13 @@ export type Category = (typeof CATEGORIES)[number];
    (never imply solo work that was a group assignment) and stays a small
    label, not a filter axis.
    ================================================================== */
-export const CONTEXTS = ['personal', 'course', 'group', 'freelance'] as const;
+export const CONTEXTS = ["personal", "course", "group", "freelance"] as const;
 export type Context = (typeof CONTEXTS)[number];
 
 /* ==================================================================
    STATUS
    ================================================================== */
-export const STATUSES = ['live', 'complete', 'in-progress', 'archived'] as const;
+export const STATUSES = ["live", "complete", "in-progress", "archived"] as const;
 export type Status = (typeof STATUSES)[number];
 
 /* ==================================================================
@@ -55,40 +55,90 @@ export type Status = (typeof STATUSES)[number];
    ================================================================== */
 export const TECH = [
   // --- languages ---
-  'C#', 'TypeScript', 'JavaScript', 'Python', 'Java', 'PHP', 'SQL', 'HTML', 'CSS',
+  "C#",
+  "TypeScript",
+  "JavaScript",
+  "Python",
+  "Java",
+  "PHP",
+  "SQL",
+  "HTML",
+  "CSS",
+  "VBA",
 
   // --- .NET ---
-  'ASP.NET Core', 'Entity Framework Core', 'AutoMapper', 'SignalR', 'Serilog',
+  "ASP.NET Core",
+  "Entity Framework Core",
+  "AutoMapper",
+  "SignalR",
+  "Serilog",
 
   // --- java ---
-  'Spring Boot', 'JPA / Hibernate', 'Maven',
+  "Spring Boot",
+  "JPA / Hibernate",
+  "Maven",
 
   // --- php ---
-  'Laravel', 'Livewire', 'Blade', 'Alpine.js',
+  "Laravel",
+  "Livewire",
+  "Blade",
+  "Alpine.js",
+  "Stripe",
 
   // --- python backend ---
-  'FastAPI',
+  "FastAPI",
 
   // --- frontend ---
-  'React', 'Astro', 'Vite', 'Tailwind CSS', 'React Router', 'Axios',
-  'Bootstrap', 'Three.js',
+  "React",
+  "Astro",
+  "Vite",
+  "Tailwind CSS",
+  "React Router",
+  "Axios",
+  "Bootstrap",
+  "Three.js",
+  "Chart.js",
 
   // --- databases ---
-  'SQL Server', 'Azure SQL', 'SQLite', 'MySQL',
+  "SQL Server",
+  "Azure SQL",
+  "SQLite",
+  "MySQL",
 
   // --- data & ai ---
-  'Pandas', 'NumPy', 'Matplotlib', 'Seaborn', 'scikit-learn', 'TensorFlow',
-  'Keras', 'BeautifulSoup', 'Requests', 'SPARQL', 'Jupyter', 'Qlik Cloud',
+  "Pandas",
+  "NumPy",
+  "Matplotlib",
+  "Seaborn",
+  "scikit-learn",
+  "TensorFlow",
+  "Keras",
+  "BeautifulSoup",
+  "Requests",
+  "SPARQL",
+  "Jupyter",
+  "Qlik Cloud",
 
   // --- testing ---
-  'MSTest', 'Moq', 'pytest', 'JUnit', 'Mockito',
+  "MSTest",
+  "Moq",
+  "pytest",
+  "JUnit",
+  "Mockito",
 
   // --- infrastructure ---
-  'Docker', 'Docker Compose', 'Azure', 'GitHub Actions', 'Auth0', 'Cloudinary',
-  'Git',
+  "Docker",
+  "Docker Compose",
+  "Azure",
+  "GitHub Actions",
+  "Auth0",
+  "Cloudinary",
+  "Git",
 
   // --- modelling & enterprise ---
-  'UML', 'BPMN', 'SAP S/4HANA',
+  "UML",
+  "BPMN",
+  "SAP S/4HANA",
 ] as const;
 
 export type Tech = (typeof TECH)[number];
@@ -99,87 +149,90 @@ export type Tech = (typeof TECH)[number];
  * complain the moment you add a technology above and forget it here.
  */
 export const TECH_GROUPS = [
-  'Languages',
-  'Backend',
-  'Frontend',
-  'Databases',
-  'Data & AI',
-  'Testing',
-  'Infrastructure',
-  'Modelling',
+  "Languages",
+  "Backend",
+  "Frontend",
+  "Databases",
+  "Data & AI",
+  "Testing",
+  "Infrastructure",
+  "Modelling",
 ] as const;
 
 export type TechGroup = (typeof TECH_GROUPS)[number];
 
 export const TECH_GROUP_OF: Record<Tech, TechGroup> = {
-  'C#': 'Languages',
-  'TypeScript': 'Languages',
-  'JavaScript': 'Languages',
-  'Python': 'Languages',
-  'Java': 'Languages',
-  'PHP': 'Languages',
-  'SQL': 'Languages',
-  'HTML': 'Languages',
-  'CSS': 'Languages',
+  "C#": "Languages",
+  TypeScript: "Languages",
+  JavaScript: "Languages",
+  Python: "Languages",
+  Java: "Languages",
+  PHP: "Languages",
+  SQL: "Languages",
+  HTML: "Languages",
+  CSS: "Languages",
+  VBA: "Languages",
 
-  'ASP.NET Core': 'Backend',
-  'Entity Framework Core': 'Backend',
-  'AutoMapper': 'Backend',
-  'SignalR': 'Backend',
-  'Serilog': 'Backend',
-  'Spring Boot': 'Backend',
-  'JPA / Hibernate': 'Backend',
-  'Maven': 'Backend',
-  'Laravel': 'Backend',
-  'Livewire': 'Backend',
-  'FastAPI': 'Backend',
+  "ASP.NET Core": "Backend",
+  "Entity Framework Core": "Backend",
+  AutoMapper: "Backend",
+  SignalR: "Backend",
+  Serilog: "Backend",
+  "Spring Boot": "Backend",
+  "JPA / Hibernate": "Backend",
+  Maven: "Backend",
+  Laravel: "Backend",
+  Livewire: "Backend",
+  FastAPI: "Backend",
+  Stripe: "Backend",
 
-  'React': 'Frontend',
-  'Astro': 'Frontend',
-  'Vite': 'Frontend',
-  'Tailwind CSS': 'Frontend',
-  'React Router': 'Frontend',
-  'Axios': 'Frontend',
-  'Bootstrap': 'Frontend',
-  'Three.js': 'Frontend',
-  'Blade': 'Frontend',
-  'Alpine.js': 'Frontend',
+  React: "Frontend",
+  Astro: "Frontend",
+  Vite: "Frontend",
+  "Tailwind CSS": "Frontend",
+  "React Router": "Frontend",
+  Axios: "Frontend",
+  Bootstrap: "Frontend",
+  "Three.js": "Frontend",
+  Blade: "Frontend",
+  "Alpine.js": "Frontend",
+  "Chart.js": "Frontend",
 
-  'SQL Server': 'Databases',
-  'Azure SQL': 'Databases',
-  'SQLite': 'Databases',
-  'MySQL': 'Databases',
+  "SQL Server": "Databases",
+  "Azure SQL": "Databases",
+  SQLite: "Databases",
+  MySQL: "Databases",
 
-  'Pandas': 'Data & AI',
-  'NumPy': 'Data & AI',
-  'Matplotlib': 'Data & AI',
-  'Seaborn': 'Data & AI',
-  'scikit-learn': 'Data & AI',
-  'TensorFlow': 'Data & AI',
-  'Keras': 'Data & AI',
-  'BeautifulSoup': 'Data & AI',
-  'Requests': 'Data & AI',
-  'SPARQL': 'Data & AI',
-  'Jupyter': 'Data & AI',
-  'Qlik Cloud': 'Data & AI',
+  Pandas: "Data & AI",
+  NumPy: "Data & AI",
+  Matplotlib: "Data & AI",
+  Seaborn: "Data & AI",
+  "scikit-learn": "Data & AI",
+  TensorFlow: "Data & AI",
+  Keras: "Data & AI",
+  BeautifulSoup: "Data & AI",
+  Requests: "Data & AI",
+  SPARQL: "Data & AI",
+  Jupyter: "Data & AI",
+  "Qlik Cloud": "Data & AI",
 
-  'MSTest': 'Testing',
-  'Moq': 'Testing',
-  'pytest': 'Testing',
-  'JUnit': 'Testing',
-  'Mockito': 'Testing',
+  MSTest: "Testing",
+  Moq: "Testing",
+  pytest: "Testing",
+  JUnit: "Testing",
+  Mockito: "Testing",
 
-  'Docker': 'Infrastructure',
-  'Docker Compose': 'Infrastructure',
-  'Azure': 'Infrastructure',
-  'GitHub Actions': 'Infrastructure',
-  'Auth0': 'Infrastructure',
-  'Cloudinary': 'Infrastructure',
-  'Git': 'Infrastructure',
+  Docker: "Infrastructure",
+  "Docker Compose": "Infrastructure",
+  Azure: "Infrastructure",
+  "GitHub Actions": "Infrastructure",
+  Auth0: "Infrastructure",
+  Cloudinary: "Infrastructure",
+  Git: "Infrastructure",
 
-  'UML': 'Modelling',
-  'BPMN': 'Modelling',
-  'SAP S/4HANA': 'Modelling',
+  UML: "Modelling",
+  BPMN: "Modelling",
+  "SAP S/4HANA": "Modelling",
 };
 
 /* ==================================================================
@@ -191,52 +244,61 @@ export const TECH_GROUP_OF: Record<Tech, TechGroup> = {
    ================================================================== */
 export const TOPICS = [
   // architecture & backend
-  'REST API',
-  'Layered Architecture',
-  'Repository Pattern',
-  'Design Patterns',
-  'SOLID',
-  'Domain-Driven Design',
-  'Microservices',
-  'Authentication',
-  'Real-time',
-  'Database Design',
+  "REST API",
+  "Layered Architecture",
+  "Repository Pattern",
+  "Design Patterns",
+  "SOLID",
+  "Domain-Driven Design",
+  "Microservices",
+  "Authentication",
+  "Real-time",
+  "Database Design",
 
   // quality
-  'Unit Testing',
-  'Integration Testing',
-  'Refactoring',
+  "Unit Testing",
+  "Integration Testing",
+  "Refactoring",
 
   // delivery
-  'CI/CD',
-  'Cloud Deployment',
-  'Containerisation',
+  "CI/CD",
+  "Cloud Deployment",
+  "Containerisation",
 
   // data
-  'Web Scraping',
-  'Data Cleaning',
-  'Statistical Analysis',
-  'Data Visualisation',
-  'Dashboarding',
-  'Open Data',
+  "Web Scraping",
+  "Data Cleaning",
+  "Statistical Analysis",
+  "Data Visualisation",
+  "Dashboarding",
+  "Open Data",
 
   // ai
-  'Machine Learning',
-  'Deep Learning',
-  'Computer Vision',
-  'Natural Language Processing',
+  "Machine Learning",
+  "Deep Learning",
+  "Computer Vision",
+  "Natural Language Processing",
 
   // analysis & modelling
-  'Requirements Analysis',
-  'UML Modelling',
-  'Business Process Modelling',
+  "Requirements Analysis",
+  "UML Modelling",
+  "Business Process Modelling",
 
   // frontend & web
-  'Responsive Design',
-  'Accessibility',
-  'Internationalisation',
-  'SEO',
-  '3D / WebGL',
+  "Responsive Design",
+  "Accessibility",
+  "Internationalisation",
+  "SEO",
+  "3D / WebGL",
+
+  // project management & collaboration
+  "Payment Integration",
+  "Agile / Scrum",
+  "Client Collaboration",
 ] as const;
 
 export type Topic = (typeof TOPICS)[number];
+
+/** Distinguishes work history from education on the same timeline. */
+export const EXPERIENCE_KINDS = ["work", "education", "volunteer"] as const;
+export type ExperienceKind = (typeof EXPERIENCE_KINDS)[number];

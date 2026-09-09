@@ -1,0 +1,97 @@
+---
+project: feest-op-tafel
+locale: es
+
+title: Feest op Tafel — pedidos de postres para un cliente real
+summary: >-
+  Plataforma de pedidos y catering en Laravel construida para un cliente
+  real por un equipo de cinco, entregada con Scrum y desplegada en
+  producción.
+
+role: Equipo de 5 — módulo de catering, gestión de ingredientes, analítica de administración
+
+coverAlt: El panel de cliente de Feest op Tafel con postres y pedidos
+
+metrics:
+  - label: Tamaño del equipo
+    value: "5"
+  - label: Metodología
+    value: Scrum
+  - label: Estado
+    value: En producción
+---
+
+## El encargo
+
+Kathleen Renders lleva un negocio de postres y catering, y gestionaba
+pedidos, inscripciones a talleres y listas de la compra a mano. Skills
+Integration Lab la asignó a nuestro equipo de cinco como cliente real:
+ella definía los requisitos, nosotros ejecutábamos los sprints, y ella
+usaba lo que entregábamos.
+
+El resultado es una aplicación Laravel donde los clientes piden postres,
+compran excedentes con descuento, se inscriben en talleres y envían
+solicitudes de catering, y donde la propietaria gestiona todo el catálogo
+y consulta la analítica de ventas.
+
+Trabajar con una clienta sin perfil técnico cambió la forma en que
+llegaban los requisitos. "Quiero saber qué tengo que comprar esta semana"
+no es una especificación: convertir eso en el generador de listas de la
+compra implicó preguntar qué hacía realmente un lunes por la mañana, no
+qué creía ella que debía hacer un sistema.
+
+## Qué construí
+
+El proyecto estaba repartido entre el equipo; estas son las partes de las
+que me hice cargo.
+
+**Solicitudes de catering, de principio a fin.** Los clientes envían una
+solicitud con tipo de evento, fecha, número de personas, presupuesto y
+fórmula. Pueden marcar postres concretos como preferencia, viendo
+tamaños de ración y suplementos por paquete mientras eligen. Los temas
+salen de una lista o se escriben libremente y se añaden sobre la marcha:
+el negocio de la clienta tiene realmente un conjunto abierto de temas, y
+un desplegable cerrado habría hecho la función inservible para ella. Todo
+el flujo de correos de confirmación está automatizado desde la solicitud.
+
+**Gestión de ingredientes.** Un CRUD completo para ingredientes,
+incluida la lógica que vincula alérgenos con ingredientes. Los alérgenos
+se propagan hacia arriba: como un postre está hecho de ingredientes, su
+lista de alérgenos se deriva en lugar de mantenerse aparte, así que no
+puede quedar obsoleta cuando cambia una receta.
+
+**Analítica de administración.** Una página de evolución de precios para
+el panel de admin, con visualizaciones interactivas en Chart.js de datos
+de precio y pedidos a lo largo del tiempo, y un conmutador entre vista de
+gráfico y vista de tabla. Esa vista de tabla existe porque la clienta la
+pidió: quería las cifras, no solo la forma.
+
+**Login**, front-end y back-end.
+
+**Arquitectura del código.** Ya avanzado el proyecto reestructuré la
+organización de carpetas en dominios con sentido — `Admin/Catalog`,
+`Frontend/Checkout` y demás — y normalicé las convenciones de nombres de
+rutas, archivos y componentes Livewire en toda la aplicación. Cinco
+personas habían nombrado las cosas de forma razonable pero distinta, y a
+esas alturas encontrar un componente significaba adivinar qué convención
+había usado su autor.
+
+## Lo que me enseñó trabajar en equipo
+
+Reescribir la nomenclatura de otra persona es primero un problema social
+y después uno técnico. Hacerlo de una sola vez, con el razonamiento
+escrito y acordado de antemano, funcionó. Hacerlo poco a poco habría
+generado conflictos de merge y la impresión de que reescribía en silencio
+el trabajo ajeno.
+
+Scrum con Jira, registro de tiempo con Clockify y burndown charts fue la
+primera vez que vi retroalimentación sobre estimaciones: te comprometes a
+un sprint, no llegas, y el gráfico te dice exactamente cuánto te
+equivocaste. Eso corrige mejor que cualquier consejo sobre estimar.
+
+## Stack
+
+Laravel con Livewire y Blade, Alpine.js para la interacción del lado del
+cliente, Tailwind para los estilos, MySQL, Stripe para los pagos, y
+despliegue automático nocturno a Combell mediante un workflow de GitHub
+Actions.

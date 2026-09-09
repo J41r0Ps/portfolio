@@ -33,7 +33,7 @@ import { z } from "zod";
 import { glob } from "astro/loaders";
 
 import { LOCALES } from "./i18n/config";
-import { CATEGORIES, CONTEXTS, STATUSES, TECH, TOPICS } from "./lib/taxonomy";
+import { CATEGORIES, CONTEXTS, STATUSES, TECH, TOPICS, EXPERIENCE_KINDS } from "./lib/taxonomy";
 
 /* ==================================================================
    PROJECTS — language-neutral facts. YAML, no body.
@@ -138,4 +138,41 @@ const projectCopy = defineCollection({
   }),
 });
 
-export const collections = { projects, projectCopy };
+const experience = defineCollection({
+  loader: glob({ pattern: "**/*.yaml", base: "./src/content/experience" }),
+  schema: z.object({
+    organisation: z.string().min(2),
+    kind: z.enum(EXPERIENCE_KINDS),
+    location: z.string().optional(),
+    url: z.url().optional(),
+
+    /**
+     * ISO dates. z.coerce.date() parses "2024-09" into a Date, so
+     * sorting is real date arithmetic rather than string comparison —
+     * and an unparseable date fails the build.
+     */
+    start: z.coerce.date(),
+    /** Omit for a current position. */
+    end: z.coerce.date().optional(),
+
+    /** Optional — only where a role actually involved them. */
+    tech: z.array(z.enum(TECH)).optional(),
+  }),
+});
+
+const experienceCopy = defineCollection({
+  loader: glob({ pattern: "**/*.mdx", base: "./src/content/experience-copy" }),
+  schema: z.object({
+    entry: reference("experience"),
+    locale: z.enum(LOCALES),
+
+    /** Job title or qualification name. */
+    title: z.string().min(2),
+    /** One or two lines shown under the title. */
+    summary: z.string().max(300).optional(),
+    /** Two to four concrete things. Prefer specifics over adjectives. */
+    highlights: z.array(z.string()).max(4).optional(),
+  }),
+});
+
+export const collections = { projects, projectCopy, experience, experienceCopy };

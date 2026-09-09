@@ -1,0 +1,96 @@
+---
+project: feest-op-tafel
+locale: nl
+
+title: Feest op Tafel — dessertbestellingen voor een echte klant
+summary: >-
+  Een Laravel-platform voor bestellingen en catering, gebouwd voor een
+  echte klant door een team van vijf, opgeleverd via Scrum en live in
+  productie.
+
+role: Team van 5 — cateringmodule, ingrediëntenbeheer, admin-analytics
+
+coverAlt: Het klantendashboard van Feest op Tafel met desserts en bestellingen
+
+metrics:
+  - label: Teamgrootte
+    value: "5"
+  - label: Methodologie
+    value: Scrum
+  - label: Status
+    value: In productie
+---
+
+## De opdracht
+
+Kathleen Renders runt een dessert- en cateringzaak en beheerde
+bestellingen, workshopinschrijvingen en boodschappenlijsten met de hand.
+Skills Integration Lab koppelde haar aan ons team van vijf als echte
+opdrachtgever: zij bepaalde de vereisten, wij draaiden de sprints, en zij
+gebruikte wat we opleverden.
+
+Het resultaat is een Laravel-applicatie waarin klanten desserts
+bestellen, overschotjes met korting kopen, zich inschrijven voor
+workshops en cateringaanvragen indienen, en waarin de eigenaar het
+volledige aanbod beheert en verkoopanalyses leest.
+
+Werken met een niet-technische opdrachtgever veranderde de manier waarop
+vereisten binnenkwamen. "Ik wil weten wat ik deze week moet kopen" is
+geen specificatie — dat omzetten naar de boodschappenlijstgenerator
+betekende vragen wat ze op een maandagochtend werkelijk deed, niet wat
+ze dacht dat een systeem zou moeten doen.
+
+## Wat ik gebouwd heb
+
+Het project was verdeeld over het team; dit zijn de onderdelen die ik
+voor mijn rekening nam.
+
+**Cateringaanvragen, van begin tot eind.** Klanten dienen een aanvraag in
+met eventtype, datum, aantal personen, budget en formule. Ze kunnen
+specifieke desserts als voorkeur aanduiden, met portiegroottes en
+meerprijzen per pakket meteen zichtbaar. Thema's komen uit een lijst of
+worden vrij ingetypt en ter plekke toegevoegd — de zaak van de klant
+heeft werkelijk een open reeks thema's, en een vaste dropdown zou de
+functie voor haar onbruikbaar gemaakt hebben. De volledige mailflow voor
+bevestigingen is geautomatiseerd vanaf de ingediende aanvraag.
+
+**Ingrediëntenbeheer.** Een volledig CRUD-systeem voor ingrediënten,
+inclusief de logica die allergenen aan ingrediënten koppelt. Allergenen
+werken naar boven door: omdat een dessert uit ingrediënten bestaat, wordt
+zijn allergenenlijst afgeleid in plaats van apart onderhouden, waardoor
+die niet kan verouderen wanneer een recept wijzigt.
+
+**Admin-analytics.** Een pagina met prijsevolutie voor het
+admindashboard, met interactieve Chart.js-visualisaties van prijs- en
+besteldata over de tijd, en een schakelaar tussen grafiek- en
+tabelweergave. Die tabelweergave bestaat omdat de klant erom vroeg: ze
+wilde de cijfers, niet enkel de vorm.
+
+**Login**, front-end en back-end.
+
+**Architectuur van de codebase.** Laat in het project heb ik de
+mappenstructuur heringedeeld in betekenisvolle domeinen —
+`Admin/Catalog`, `Frontend/Checkout` enzovoort — en de naamgeving van
+routes, bestandsnamen en Livewire-componenten in de hele applicatie
+genormaliseerd. Vijf mensen hadden dingen elk redelijk maar verschillend
+benoemd, en tegen dan betekende een component zoeken raden welke
+conventie de auteur gebruikt had.
+
+## Wat werken in een team me geleerd heeft
+
+De naamgeving van iemand anders herwerken is eerst een sociaal probleem
+en pas daarna een technisch. Het in één keer doen, met de redenering
+vooraf opgeschreven en afgesproken, werkte. Het geleidelijk doen had
+merge-conflicten opgeleverd en de indruk gewekt dat ik stilletjes het
+werk van anderen herschreef.
+
+Scrum met Jira, tijdsregistratie via Clockify en burndown charts was de
+eerste keer dat ik feedback op schatten zag: je verbindt je aan een
+sprint, je haalt het niet, en de grafiek toont precies hoe ver ernaast je
+zat. Dat corrigeert beter dan eender welk advies over schatten.
+
+## Stack
+
+Laravel met Livewire en Blade, Alpine.js voor client-side interactie,
+Tailwind voor styling, MySQL, Stripe voor betalingen, en nachtelijke
+geautomatiseerde deployment naar Combell via een GitHub Actions-workflow.
