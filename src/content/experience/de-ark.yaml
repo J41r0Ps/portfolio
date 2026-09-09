@@ -1,0 +1,8 @@
+# src/content/experience/de-ark.yaml
+organisation: De Ark
+kind: work
+location: Turnhout, Belgium
+start: 2024-06-01
+end: 2024-07-31
+tech:
+  - VBA

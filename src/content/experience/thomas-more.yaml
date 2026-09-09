@@ -1,0 +1,7 @@
+# src/content/experience/thomas-more.yaml
+organisation: Thomas More University of Applied Sciences
+kind: education
+location: Geel, Belgium
+url: https://www.thomasmore.be
+start: 2024-09-01
+end: 2027-06-30      # expected — the copy says so explicitly

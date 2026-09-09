@@ -1,0 +1,12 @@
+# src/content/experience/campos-turnhout.yaml
+organisation: Campus Campos Turnhout
+kind: education
+location: Turnhout, Belgium
+start: 2022-09-01
+end: 2024-07-31
+tech:
+  - 'C#'
+  - JavaScript
+  - React
+  - SQL
+  - VBA

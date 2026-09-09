@@ -300,5 +300,5 @@ export const TOPICS = [
 export type Topic = (typeof TOPICS)[number];
 
 /** Distinguishes work history from education on the same timeline. */
-export const EXPERIENCE_KINDS = ["work", "education", "volunteer"] as const;
+export const EXPERIENCE_KINDS = ["work", "education", "certification", "volunteer"] as const;
 export type ExperienceKind = (typeof EXPERIENCE_KINDS)[number];
