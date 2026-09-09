@@ -1,0 +1,161 @@
+---
+/**
+ * AboutPage.
+ *
+ * The most-read page after the homepage, and the one where specificity
+ * matters most. Every claim here is either a fact or something backed by
+ * a project a reader can click through to — no adjectives standing in
+ * for evidence.
+ */
+import { Image } from "astro:assets";
+
+import BaseLayout from "@/layouts/BaseLayout.astro";
+import SectionHeader from "@/components/ui/SectionHeader.astro";
+import Button from "@/components/ui/Button.astro";
+
+import type { Locale } from "@/i18n/config";
+import { localizePath, useTranslations } from "@/i18n/utils";
+
+// Add the file at src/assets/jairo.jpg (portrait, ~800×1000, under 300kb
+// before optimisation — Astro handles format and sizing from there).
+import portrait from "@/assets/jairo.jpg";
+
+interface Props {
+  locale: Locale;
+}
+
+const { locale }: Props = Astro.props;
+const t = useTranslations(locale);
+
+/** Kept as data so the markup stays a loop rather than three copies. */
+const methods = [
+  { title: t("about.method.1.title"), body: t("about.method.1.body") },
+  { title: t("about.method.2.title"), body: t("about.method.2.body") },
+  { title: t("about.method.3.title"), body: t("about.method.3.body") },
+];
+
+const languages = [
+  { name: t("about.languages.spanish"), level: t("about.languages.spanish.level") },
+  { name: t("about.languages.dutch"), level: t("about.languages.dutch.level") },
+  { name: t("about.languages.english"), level: t("about.languages.english.level") },
+];
+---
+
+<BaseLayout title={t("about.title")} description={t("about.meta.description")} locale={locale}>
+  {/* ---------- INTRO ---------- */}
+  <section class="hero-gradient border-b border-border">
+    <div class="container-page grid items-center gap-12 py-16 sm:py-20 lg:grid-cols-[1.4fr_1fr]">
+      <div>
+        <SectionHeader number={1} title={t("about.title")} as="h1" />
+
+        <p class="mt-8 max-w-2xl text-lg leading-relaxed text-text-muted">
+          {t("about.intro.p1")}
+        </p>
+        <p class="mt-4 max-w-2xl text-lg leading-relaxed text-text-muted">
+          {t("about.intro.p2")}
+        </p>
+      </div>
+
+      <div class="mx-auto w-full max-w-sm lg:mx-0">
+        <Image
+          src={portrait}
+          alt={t("about.title")}
+          widths={[320, 640]}
+          sizes="(min-width: 1024px) 360px, 320px"
+          class="w-full rounded-2xl border border-border object-cover shadow-card-light"
+          loading="eager"
+        />
+      </div>
+    </div>
+  </section>
+
+  {/* ---------- THE PATH ---------- */}
+  <section class="container-page py-16 sm:py-24">
+    <div class="grid gap-8 lg:grid-cols-[1fr_1.6fr] lg:gap-16">
+      <SectionHeader number={2} title={t("about.path.title")} />
+
+      <div class="max-w-2xl space-y-4 text-lg leading-relaxed text-text-muted">
+        <p>{t("about.path.p1")}</p>
+        <p>{t("about.path.p2")}</p>
+      </div>
+    </div>
+  </section>
+
+  {/* ---------- HOW I WORK ---------- */}
+  <section class="border-y border-border bg-surface-sunken">
+    <div class="container-page py-16 sm:py-24">
+      <SectionHeader
+        number={3}
+        title={t("about.method.title")}
+        subtitle={t("about.method.intro")}
+      />
+
+      <ol class="mt-10 grid gap-6 lg:grid-cols-3">
+        {
+          methods.map((method, index) => (
+            <li class="rounded-xl border border-border bg-surface-raised p-6">
+              <span class="font-mono text-xs text-accent">
+                {String(index + 1).padStart(2, "0")}
+              </span>
+              <h3 class="mt-3 font-display text-lg font-bold text-text">{method.title}</h3>
+              <p class="mt-3 text-sm leading-relaxed text-text-muted">{method.body}</p>
+            </li>
+          ))
+        }
+      </ol>
+    </div>
+  </section>
+
+  {/* ---------- LANGUAGES ---------- */}
+  <section class="container-page py-16 sm:py-24">
+    <div class="grid gap-8 lg:grid-cols-[1fr_1.6fr] lg:gap-16">
+      <SectionHeader number={4} title={t("about.languages.title")} />
+
+      <dl class="max-w-2xl divide-y divide-border">
+        {
+          languages.map((language) => (
+            <div class="flex flex-wrap items-baseline justify-between gap-x-6 gap-y-1 py-4 first:pt-0">
+              <dt class="font-display text-base font-bold text-text">{language.name}</dt>
+              <dd class="font-mono text-sm text-text-muted">{language.level}</dd>
+            </div>
+          ))
+        }
+      </dl>
+    </div>
+  </section>
+
+  {/* ---------- BEYOND CODE ---------- */}
+  <section class="border-t border-border">
+    <div class="container-page py-16 sm:py-24">
+      <div class="grid gap-8 lg:grid-cols-[1fr_1.6fr] lg:gap-16">
+        <SectionHeader number={5} title={t("about.beyond.title")} />
+
+        <p class="max-w-2xl text-lg leading-relaxed text-text-muted">
+          {t("about.beyond.body")}
+        </p>
+      </div>
+    </div>
+  </section>
+
+  {/* ---------- OPEN TO NEW CHALLENGES ---------- */}
+  <section class="border-t border-border">
+    <div class="hero-gradient">
+      <div class="container-page py-16 text-center sm:py-24">
+        <h2 class="font-display text-3xl font-bold tracking-tight text-text sm:text-4xl">
+          {t("about.open.title")}
+        </h2>
+        <p class="mx-auto mt-4 max-w-xl text-text-muted">
+          {t("about.open.body")}
+        </p>
+        <div class="mt-8 flex flex-wrap justify-center gap-3">
+          <Button href={localizePath("/contact", locale)}>
+            {t("cta.getInTouch")}
+          </Button>
+          <Button href={localizePath("/projects", locale)} variant="secondary">
+            {t("cta.viewAll")}
+          </Button>
+        </div>
+      </div>
+    </div>
+  </section>
+</BaseLayout>

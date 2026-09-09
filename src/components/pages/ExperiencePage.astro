@@ -1,0 +1,123 @@
+---
+/**
+ * ExperiencePage — work, education and certifications on one timeline.
+ *
+ * Zero JavaScript. Sections with no entries are skipped entirely, except
+ * certifications, which shows a short "in progress" note instead —
+ * an empty heading looks like a bug, but saying certifications are
+ * planned is honest and useful.
+ */
+import BaseLayout from "@/layouts/BaseLayout.astro";
+import SectionHeader from "@/components/ui/SectionHeader.astro";
+import TimelineItem from "@/components/TimelineItem.astro";
+
+import type { Locale } from "@/i18n/config";
+import { useTranslations } from "@/i18n/utils";
+import { getExperienceByKind } from "@/lib/experience";
+
+interface Props {
+  locale: Locale;
+}
+
+const { locale }: Props = Astro.props;
+const t = useTranslations(locale);
+
+const [work, education, certifications] = await Promise.all([
+  getExperienceByKind(locale, "work"),
+  getExperienceByKind(locale, "education"),
+  getExperienceByKind(locale, "certification"),
+]);
+---
+
+<BaseLayout
+  title={t("experience.title")}
+  description={t("experience.meta.description")}
+  locale={locale}
+>
+  <section class="hero-gradient border-b border-border">
+    <div class="container-page py-16 sm:py-20">
+      <SectionHeader number={1} title={t("experience.title")} as="h1" />
+    </div>
+  </section>
+
+  <div class="container-page grid gap-16 py-16 sm:py-20 lg:grid-cols-[220px_1fr] lg:gap-12">
+    {
+      /* Sticky section index. Hidden below lg, where the page is short
+        enough to scroll without one. */
+    }
+    <nav class="hidden lg:block" aria-label={t("experience.title")}>
+      <ul class="sticky top-24 space-y-2 font-mono text-xs">
+        <li>
+          <a href="#work" class="text-text-muted transition-colors hover:text-accent">
+            {t("experience.work")}
+          </a>
+        </li>
+        <li>
+          <a href="#education" class="text-text-muted transition-colors hover:text-accent">
+            {t("experience.education")}
+          </a>
+        </li>
+        <li>
+          <a href="#certifications" class="text-text-muted transition-colors hover:text-accent">
+            {t("experience.certification")}
+          </a>
+        </li>
+      </ul>
+    </nav>
+
+    <div class="space-y-16">
+      {/* ---------- WORK ---------- */}
+      {
+        work.length > 0 && (
+          <section id="work" class="scroll-mt-24">
+            <h2 class="font-mono text-xs tracking-widest text-accent uppercase">
+              {t("experience.work")}
+            </h2>
+            <ul class="mt-8">
+              {work.map((item) => (
+                <TimelineItem item={item} locale={locale} />
+              ))}
+            </ul>
+          </section>
+        )
+      }
+
+      {/* ---------- EDUCATION ---------- */}
+      {
+        education.length > 0 && (
+          <section id="education" class="scroll-mt-24">
+            <h2 class="font-mono text-xs tracking-widest text-accent uppercase">
+              {t("experience.education")}
+            </h2>
+            <ul class="mt-8">
+              {education.map((item) => (
+                <TimelineItem item={item} locale={locale} expected={item.slug === "thomas-more"} />
+              ))}
+            </ul>
+          </section>
+        )
+      }
+
+      {/* ---------- CERTIFICATIONS ---------- */}
+      <section id="certifications" class="scroll-mt-24">
+        <h2 class="font-mono text-xs tracking-widest text-accent uppercase">
+          {t("experience.certification")}
+        </h2>
+
+        {
+          certifications.length > 0 ? (
+            <ul class="mt-8">
+              {certifications.map((item) => (
+                <TimelineItem item={item} locale={locale} />
+              ))}
+            </ul>
+          ) : (
+            <p class="mt-6 max-w-2xl text-sm leading-relaxed text-text-muted">
+              {t("experience.certification.empty")}
+            </p>
+          )
+        }
+      </section>
+    </div>
+  </div>
+</BaseLayout>
