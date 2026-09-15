@@ -155,6 +155,22 @@ export const en = {
   "about.open.title": "Open to new challenges",
   "about.open.body":
     "I am looking for an internship where I can work on real systems with people who are better than me at this. Backend or full-stack, and I am happy to be the person who asks a lot of questions in the first month.",
+
+  // --- projects ---
+  "projects.meta.description":
+    "Full-stack, backend and data science projects — what I built, why, and what went wrong on the way.",
+  "projects.filter.category": "Category",
+  "projects.filter.tech": "Technology",
+  "projects.filter.topics": "Focus",
+  "projects.results.one": "{count} project",
+  "projects.results.other": "{count} projects",
+
+  "category.full-stack": "Full-stack",
+  "category.backend": "Backend",
+  "category.frontend": "Frontend",
+  "category.data-science": "Data science",
+  "category.ai-ml": "AI & machine learning",
+  "category.devops": "DevOps",
 } satisfies Record<string, string>;
 
 /**
@@ -283,6 +299,21 @@ export const nl: Dictionary = {
   "about.open.title": "Open voor nieuwe uitdagingen",
   "about.open.body":
     "Ik zoek een stage waar ik aan echte systemen kan werken met mensen die hier beter in zijn dan ik. Backend of full-stack, en ik ben graag degene die de eerste maand veel vragen stelt.",
+
+  "projects.meta.description":
+    "Full-stack-, backend- en data-scienceprojecten — wat ik bouwde, waarom, en wat er onderweg misging.",
+  "projects.filter.category": "Categorie",
+  "projects.filter.tech": "Technologie",
+  "projects.filter.topics": "Focus",
+  "projects.results.one": "{count} project",
+  "projects.results.other": "{count} projecten",
+
+  "category.full-stack": "Full-stack",
+  "category.backend": "Backend",
+  "category.frontend": "Frontend",
+  "category.data-science": "Data science",
+  "category.ai-ml": "AI & machine learning",
+  "category.devops": "DevOps",
 };
 
 export const es: Dictionary = {
@@ -403,6 +434,21 @@ export const es: Dictionary = {
   "about.open.title": "Abierto a nuevos retos",
   "about.open.body":
     "Busco unas prácticas donde pueda trabajar en sistemas reales con gente que sepa más que yo. Backend o full-stack, y no me importa ser quien hace muchas preguntas el primer mes.",
+
+  "projects.meta.description":
+    "Proyectos full-stack, backend y de ciencia de datos — qué construí, por qué, y qué salió mal por el camino.",
+  "projects.filter.category": "Categoría",
+  "projects.filter.tech": "Tecnología",
+  "projects.filter.topics": "Enfoque",
+  "projects.results.one": "{count} proyecto",
+  "projects.results.other": "{count} proyectos",
+
+  "category.full-stack": "Full-stack",
+  "category.backend": "Backend",
+  "category.frontend": "Frontend",
+  "category.data-science": "Ciencia de datos",
+  "category.ai-ml": "IA y machine learning",
+  "category.devops": "DevOps",
 };
 
 export const ui: Record<Locale, Dictionary> = { en, nl, es };

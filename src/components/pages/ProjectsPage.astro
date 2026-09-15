@@ -1,0 +1,146 @@
+---
+/**
+ * ProjectsPage — every project, always in the HTML.
+ *
+ * No fetching, no client-side list rendering. Every card is written into
+ * the document at build time, which is what makes the whole catalogue
+ * readable to a crawler, to an ATS parser, and to anyone with JavaScript
+ * disabled.
+ *
+ * Session 10 adds a filter island. It will only ever toggle visibility —
+ * it will not decide what exists. That distinction is the reason this
+ * page is structured the way it is.
+ */
+import BaseLayout from "@/layouts/BaseLayout.astro";
+import SectionHeader from "@/components/ui/SectionHeader.astro";
+import ProjectCard from "@/components/ProjectCard.astro";
+import ProjectFilter from "@/components/islands/ProjectFilter";
+
+import type { Locale } from "@/i18n/config";
+import { useTranslations } from "@/i18n/utils";
+import {
+  getProjects,
+  getProjectStats,
+  getCategoryFacets,
+  getTechFacets,
+  getTopicFacets,
+} from "@/lib/projects";
+import { CATEGORY_KEY } from "@/lib/taxonomy";
+
+interface Props {
+  locale: Locale;
+}
+
+const { locale }: Props = Astro.props;
+const t = useTranslations(locale);
+
+const [projects, stats, categories, tech, topics] = await Promise.all([
+  getProjects(locale),
+  getProjectStats(locale),
+  getCategoryFacets(locale),
+  getTechFacets(locale),
+  getTopicFacets(locale),
+]);
+
+const categoryFacets = categories.map((f) => ({
+  value: f.value,
+  label: t(CATEGORY_KEY[f.value]),
+  count: f.count,
+}));
+
+const topicFacets = topics.map((f) => ({ value: f.value, label: f.value, count: f.count }));
+const techFacets = tech.map((f) => ({ value: f.value, label: f.value, count: f.count }));
+
+const filterLabels = {
+  category: t("projects.filter.category"),
+  topics: t("projects.filter.topics"),
+  tech: t("projects.filter.tech"),
+  clear: t("projects.filter.clear"),
+  resultsOne: t("projects.results.one"),
+  resultsOther: t("projects.results.other"),
+};
+---
+
+<BaseLayout
+  title={t("projects.title")}
+  description={t("projects.meta.description")}
+  locale={locale}
+>
+  {/* ---------- HEADER + STATS ---------- */}
+  <section class="hero-gradient border-b border-border">
+    <div class="container-page py-16 sm:py-20">
+      <SectionHeader
+        number={1}
+        title={t("projects.title")}
+        subtitle={t("projects.meta.description")}
+        as="h1"
+      />
+
+      {
+        /*
+        Every number derived from the collection. Adding a project
+        updates all three, in all three languages, with no edit here.
+      */
+      }
+      <dl class="mt-10 flex flex-wrap gap-x-10 gap-y-4">
+        <div>
+          <dt class="font-mono text-xs tracking-wide text-text-muted uppercase">
+            {t("home.stats.projects")}
+          </dt>
+          <dd class="mt-1 font-display text-2xl font-bold text-text">
+            {stats.projectCount}
+          </dd>
+        </div>
+        <div>
+          <dt class="font-mono text-xs tracking-wide text-text-muted uppercase">
+            {t("home.stats.technologies")}
+          </dt>
+          <dd class="mt-1 font-display text-2xl font-bold text-text">
+            {stats.techCount}
+          </dd>
+        </div>
+        <div>
+          <dt class="font-mono text-xs tracking-wide text-text-muted uppercase">
+            {t("home.stats.latest")}
+          </dt>
+          <dd class="mt-1 font-display text-2xl font-bold text-text">
+            {stats.latestYear}
+          </dd>
+        </div>
+      </dl>
+    </div>
+  </section>
+
+  <section class="border-b border-border bg-surface-sunken">
+    <div class="container-page py-8">
+      <ProjectFilter
+        client:idle
+        categories={categoryFacets}
+        topics={topicFacets}
+        tech={techFacets}
+        labels={filterLabels}
+      />
+    </div>
+  </section>
+
+  {/* ---------- GRID ---------- */}
+  <section class="container-page py-12 sm:py-16">
+    <ul class="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
+      {
+        projects.map((project) => (
+          <li class="flex">
+            <ProjectCard project={project} locale={locale} as="h2" />
+          </li>
+        ))
+      }
+    </ul>
+
+    {
+      /* Shown by the filter island when nothing matches. Present in the
+        HTML from the start so no element has to be created at runtime. */
+    }
+    <p hidden data-empty-state class="py-16 text-center text-text-muted">
+      {t("projects.empty")}
+    </p>
+  </section>
+</BaseLayout>

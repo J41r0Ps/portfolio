@@ -15,6 +15,8 @@
  * it — loudly, which is the point.
  */
 
+import type { UIKey } from "@/i18n/ui";
+
 /* ==================================================================
    CATEGORY — exactly one per project. The top-level view.
    ================================================================== */
@@ -302,3 +304,16 @@ export type Topic = (typeof TOPICS)[number];
 /** Distinguishes work history from education on the same timeline. */
 export const EXPERIENCE_KINDS = ["work", "education", "certification", "volunteer"] as const;
 export type ExperienceKind = (typeof EXPERIENCE_KINDS)[number];
+
+/**
+ * Category → translation key. Typed both ways: a new category with no
+ * key fails to compile, and a typo in a key fails too.
+ */
+export const CATEGORY_KEY = {
+  "full-stack": "category.full-stack",
+  backend: "category.backend",
+  frontend: "category.frontend",
+  "data-science": "category.data-science",
+  "ai-ml": "category.ai-ml",
+  devops: "category.devops",
+} as const satisfies Record<Category, UIKey>;
