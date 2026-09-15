@@ -171,6 +171,27 @@ export const en = {
   "category.data-science": "Data science",
   "category.ai-ml": "AI & machine learning",
   "category.devops": "DevOps",
+
+  // --- project detail ---
+  "project.backToProjects": "All projects",
+  "project.role": "Role",
+  "project.year": "Year",
+  "project.stack": "Built with",
+  "project.focus": "Focus",
+  "project.status": "Status",
+  "project.links": "Links",
+  "project.previous": "Previous",
+  "project.next": "Next",
+
+  "status.live": "Live",
+  "status.complete": "Complete",
+  "status.in-progress": "In progress",
+  "status.archived": "Archived",
+
+  "context.personal": "Personal project",
+  "context.course": "Course project",
+  "context.group": "Team project",
+  "context.freelance": "Freelance",
 } satisfies Record<string, string>;
 
 /**
@@ -314,6 +335,26 @@ export const nl: Dictionary = {
   "category.data-science": "Data science",
   "category.ai-ml": "AI & machine learning",
   "category.devops": "DevOps",
+
+  "project.backToProjects": "Alle projecten",
+  "project.role": "Rol",
+  "project.year": "Jaar",
+  "project.stack": "Gebouwd met",
+  "project.focus": "Focus",
+  "project.status": "Status",
+  "project.links": "Links",
+  "project.previous": "Vorige",
+  "project.next": "Volgende",
+
+  "status.live": "Live",
+  "status.complete": "Afgerond",
+  "status.in-progress": "In uitvoering",
+  "status.archived": "Gearchiveerd",
+
+  "context.personal": "Persoonlijk project",
+  "context.course": "Cursusproject",
+  "context.group": "Teamproject",
+  "context.freelance": "Freelance",
 };
 
 export const es: Dictionary = {
@@ -449,6 +490,26 @@ export const es: Dictionary = {
   "category.data-science": "Ciencia de datos",
   "category.ai-ml": "IA y machine learning",
   "category.devops": "DevOps",
+
+  "project.backToProjects": "Todos los proyectos",
+  "project.role": "Rol",
+  "project.year": "Año",
+  "project.stack": "Construido con",
+  "project.focus": "Enfoque",
+  "project.status": "Estado",
+  "project.links": "Enlaces",
+  "project.previous": "Anterior",
+  "project.next": "Siguiente",
+
+  "status.live": "En producción",
+  "status.complete": "Completado",
+  "status.in-progress": "En curso",
+  "status.archived": "Archivado",
+
+  "context.personal": "Proyecto personal",
+  "context.course": "Proyecto de curso",
+  "context.group": "Proyecto en equipo",
+  "context.freelance": "Freelance",
 };
 
 export const ui: Record<Locale, Dictionary> = { en, nl, es };

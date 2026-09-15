@@ -159,3 +159,38 @@ function countBy<T extends string>(values: T[]): Array<{ value: T; count: number
     .map(([value, count]) => ({ value, count }))
     .sort((a, b) => b.count - a.count || a.value.localeCompare(b.value));
 }
+
+/**
+ * Static paths for one locale's detail pages.
+ *
+ * getStaticPaths() can only live in a page file, not in a component, so
+ * each of the three route files calls this. Keeping the logic here means
+ * the three routes stay four lines each and cannot drift apart.
+ */
+export async function getProjectPaths(locale: Locale) {
+  const projects = await getProjects(locale);
+
+  return projects.map((project) => ({
+    params: { slug: project.slug },
+    props: { project, locale },
+  }));
+}
+
+/**
+ * The projects either side of this one, for prev/next navigation.
+ *
+ * Wraps around: the newest project's "previous" is the oldest. A dead
+ * end at either end of the list is a worse experience than a loop, and
+ * a reader who reaches the last case study should have somewhere to go.
+ */
+export async function getAdjacentProjects(slug: string, locale: Locale) {
+  const projects = await getProjects(locale);
+  const index = projects.findIndex((project) => project.slug === slug);
+
+  if (index === -1) return { previous: undefined, next: undefined };
+
+  return {
+    previous: projects[(index - 1 + projects.length) % projects.length],
+    next: projects[(index + 1) % projects.length],
+  };
+}

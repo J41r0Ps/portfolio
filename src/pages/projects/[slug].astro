@@ -1,0 +1,12 @@
+---
+import ProjectDetailPage from "@/components/pages/ProjectDetailPage.astro";
+import { getProjectPaths } from "@/lib/projects";
+
+export async function getStaticPaths() {
+  return getProjectPaths("en");
+}
+
+const { project, locale } = Astro.props;
+---
+
+<ProjectDetailPage project={project} locale={locale} />

@@ -317,3 +317,17 @@ export const CATEGORY_KEY = {
   "ai-ml": "category.ai-ml",
   devops: "category.devops",
 } as const satisfies Record<Category, UIKey>;
+
+export const STATUS_KEY = {
+  live: "status.live",
+  complete: "status.complete",
+  "in-progress": "status.in-progress",
+  archived: "status.archived",
+} as const satisfies Record<Status, UIKey>;
+
+export const CONTEXT_KEY = {
+  personal: "context.personal",
+  course: "context.course",
+  group: "context.group",
+  freelance: "context.freelance",
+} as const satisfies Record<Context, UIKey>;

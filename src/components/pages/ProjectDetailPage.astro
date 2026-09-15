@@ -1,0 +1,256 @@
+---
+/**
+ * ProjectDetailPage — the case study.
+ *
+ * This is the page a reviewer actually spends time on, and the one that
+ * decides whether the rest of the site was worth reading. Everything
+ * here is static: the body is MDX rendered at build time, the metadata
+ * comes from the facts collection, and there is no JavaScript.
+ */
+import { Image } from 'astro:assets';
+import { render } from 'astro:content';
+
+import BaseLayout from '@/layouts/BaseLayout.astro';
+import Button from '@/components/ui/Button.astro';
+import Chip from '@/components/ui/Chip.astro';
+
+import type { Locale } from '@/i18n/config';
+import { localizePath, useTranslations } from '@/i18n/utils';
+import { getAdjacentProjects, type Project } from '@/lib/projects';
+import { CATEGORY_KEY, CONTEXT_KEY, STATUS_KEY } from '@/lib/taxonomy';
+import { SITE } from '@/lib/site';
+
+interface Props {
+  project: Project;
+  locale: Locale;
+}
+
+const { project, locale }: Props = Astro.props;
+const t = useTranslations(locale);
+
+/**
+ * render() compiles the MDX body into a component. It runs at build
+ * time — the markdown never reaches the browser, only the HTML it
+ * produced.
+ */
+const { Content } = await render(project.entry);
+
+const { previous, next } = await getAdjacentProjects(project.slug, locale);
+
+const projectsHref = localizePath('/projects', locale);
+const homeHref = localizePath('/', locale);
+
+/**
+ * BreadcrumbList structured data. Google renders this as the breadcrumb
+ * trail in search results instead of a bare URL, which measurably
+ * improves click-through. It has to mirror the visible breadcrumbs —
+ * describing a path the page doesn't show is a spam signal.
+ */
+const breadcrumbs = {
+  '@context': 'https://schema.org',
+  '@type': 'BreadcrumbList',
+  itemListElement: [
+    {
+      '@type': 'ListItem',
+      position: 1,
+      name: SITE.name,
+      item: new URL(homeHref, Astro.site).href,
+    },
+    {
+      '@type': 'ListItem',
+      position: 2,
+      name: t('projects.title'),
+      item: new URL(projectsHref, Astro.site).href,
+    },
+    {
+      '@type': 'ListItem',
+      position: 3,
+      name: project.title,
+      item: new URL(Astro.url.pathname, Astro.site).href,
+    },
+  ],
+};
+---
+
+<BaseLayout title={project.title} description={project.summary} locale={locale}>
+  <script type="application/ld+json" set:html={JSON.stringify(breadcrumbs)} is:inline />
+
+  {/* ---------- BREADCRUMBS ---------- */}
+  <nav aria-label="Breadcrumb" class="border-b border-border">
+    <ol class="container-page flex items-center gap-2 py-4 font-mono text-xs text-text-muted">
+      <li><a href={homeHref} class="transition-colors hover:text-accent">{SITE.name}</a></li>
+      <li aria-hidden="true">/</li>
+      <li>
+        <a href={projectsHref} class="transition-colors hover:text-accent">
+          {t('projects.title')}
+        </a>
+      </li>
+      <li aria-hidden="true">/</li>
+      <li class="truncate text-text" aria-current="page">{project.name}</li>
+    </ol>
+  </nav>
+
+  {/* ---------- HERO ---------- */}
+  <section class="hero-gradient border-b border-border">
+    <div class="container-page py-14 sm:py-20">
+      <p class="font-mono text-xs tracking-widest text-accent uppercase">
+        {t(CATEGORY_KEY[project.category])} · {project.year}
+      </p>
+
+      <h1 class="mt-5 max-w-3xl font-display text-4xl leading-tight font-bold tracking-tight text-text sm:text-5xl">
+        {project.title}
+      </h1>
+
+      <p class="mt-5 max-w-2xl text-lg leading-relaxed text-text-muted">
+        {project.summary}
+      </p>
+
+      {
+        project.metrics && project.metrics.length > 0 && (
+          <dl class="mt-10 flex flex-wrap gap-x-10 gap-y-4">
+            {project.metrics.map((metric) => (
+              <div>
+                <dt class="font-mono text-xs tracking-wide text-text-muted uppercase">
+                  {metric.label}
+                </dt>
+                <dd class="mt-1 font-display text-2xl font-bold text-text">
+                  {metric.value}
+                </dd>
+              </div>
+            ))}
+          </dl>
+        )
+      }
+    </div>
+  </section>
+
+  {
+    project.cover && (
+      <div class="container-page -mt-px">
+        <Image
+          src={project.cover}
+          alt={project.coverAlt ?? project.title}
+          widths={[800, 1200, 1600]}
+          sizes="(min-width: 1024px) 1100px, 100vw"
+          class="w-full rounded-xl border border-border object-cover"
+          loading="eager"
+        />
+      </div>
+    )
+  }
+
+  {/* ---------- BODY + SIDEBAR ---------- */}
+  <div class="container-page grid gap-12 py-14 sm:py-20 lg:grid-cols-[1fr_260px] lg:gap-16">
+    <article class="prose-case max-w-2xl">
+      <Content />
+    </article>
+
+    {/*
+      Sidebar comes second in the DOM so a screen reader and a mobile
+      visitor reach the case study first. `lg:order-last` is not needed —
+      the grid places it right on desktop regardless of source order.
+    */}
+    <aside class="space-y-8 lg:sticky lg:top-24 lg:self-start">
+      {
+        project.role && (
+          <div>
+            <h2 class="font-mono text-xs tracking-widest text-accent uppercase">
+              {t('project.role')}
+            </h2>
+            <p class="mt-2 text-sm text-text-muted">{project.role}</p>
+          </div>
+        )
+      }
+
+      <div>
+        <h2 class="font-mono text-xs tracking-widest text-accent uppercase">
+          {t('project.status')}
+        </h2>
+        <p class="mt-2 text-sm text-text-muted">
+          {t(STATUS_KEY[project.status])} · {t(CONTEXT_KEY[project.context])}
+          {project.period && <span> · {project.period}</span>}
+        </p>
+      </div>
+
+      <div>
+        <h2 class="font-mono text-xs tracking-widest text-accent uppercase">
+          {t('project.stack')}
+        </h2>
+        <ul class="mt-3 flex flex-wrap gap-1.5">
+          {project.tech.map((tech) => <li><Chip>{tech}</Chip></li>)}
+        </ul>
+      </div>
+
+      <div>
+        <h2 class="font-mono text-xs tracking-widest text-accent uppercase">
+          {t('project.focus')}
+        </h2>
+        <ul class="mt-3 flex flex-wrap gap-1.5">
+          {project.topics.map((topic) => <li><Chip>{topic}</Chip></li>)}
+        </ul>
+      </div>
+
+      {
+        (project.links.repo || project.links.live || project.links.docs) && (
+          <div>
+            <h2 class="font-mono text-xs tracking-widest text-accent uppercase">
+              {t('project.links')}
+            </h2>
+            <div class="mt-3 flex flex-col gap-2">
+              {project.links.live && (
+                <Button href={project.links.live} external size="sm">
+                  {t('cta.liveSite')}
+                </Button>
+              )}
+              {project.links.repo && (
+                <Button href={project.links.repo} external size="sm" variant="secondary">
+                  {t('cta.sourceCode')}
+                </Button>
+              )}
+            </div>
+          </div>
+        )
+      }
+    </aside>
+  </div>
+
+  {/* ---------- PREV / NEXT ---------- */}
+  {
+    previous && next && (
+      <nav
+        aria-label={t('projects.title')}
+        class="border-t border-border bg-surface-sunken"
+      >
+        <div class="container-page grid gap-6 py-10 sm:grid-cols-2">
+          <a
+            href={localizePath(`/projects/${previous.slug}`, locale)}
+            class="group rounded-xl border border-border bg-surface-raised p-5
+                   transition-colors hover:border-accent"
+          >
+            <span class="font-mono text-xs text-text-muted">
+              ← {t('project.previous')}
+            </span>
+            <p class="mt-2 font-display font-bold text-text">{previous.title}</p>
+          </a>
+
+          <a
+            href={localizePath(`/projects/${next.slug}`, locale)}
+            class="group rounded-xl border border-border bg-surface-raised p-5
+                   text-right transition-colors hover:border-accent"
+          >
+            <span class="font-mono text-xs text-text-muted">
+              {t('project.next')} →
+            </span>
+            <p class="mt-2 font-display font-bold text-text">{next.title}</p>
+          </a>
+        </div>
+      </nav>
+    )
+  }
+
+  <div class="container-page py-10">
+    <Button href={projectsHref} variant="secondary">
+      ← {t('project.backToProjects')}
+    </Button>
+  </div>
+</BaseLayout>
