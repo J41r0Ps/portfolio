@@ -47,17 +47,17 @@ const [work, education, certifications] = await Promise.all([
     }
     <nav class="hidden lg:block" aria-label={t("experience.title")}>
       <ul class="sticky top-24 space-y-2 font-mono text-xs">
-        <li>
+        <li class="reveal">
           <a href="#work" class="text-text-muted transition-colors hover:text-accent">
             {t("experience.work")}
           </a>
         </li>
-        <li>
+        <li class="reveal">
           <a href="#education" class="text-text-muted transition-colors hover:text-accent">
             {t("experience.education")}
           </a>
         </li>
-        <li>
+        <li class="reveal">
           <a href="#certifications" class="text-text-muted transition-colors hover:text-accent">
             {t("experience.certification")}
           </a>

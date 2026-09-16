@@ -321,3 +321,196 @@
     border-color: var(--border);
   }
 }
+
+@view-transition {
+  navigation: auto;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  ::view-transition-group(*),
+  ::view-transition-old(*),
+  ::view-transition-new(*) {
+    animation: none !important;
+  }
+}
+
+/* The header should stay put across navigations rather than fade with
+   the rest of the page. Naming it gives it its own transition group. */
+@media (prefers-reduced-motion: no-preference) {
+  .site-header {
+    view-transition-name: site-header;
+  }
+}
+
+/* ---------------------------------------------------------------
+   SCROLL PROGRESS BAR
+
+   The v1 version of this ran through Framer Motion, recalculating on
+   every scroll frame on the main thread. This is the same output in
+   nine lines, off the main thread.
+
+   Note there is no animation-duration: it is ignored when
+   animation-timeline is a scroll or view timeline. Progress comes
+   entirely from scroll position.
+   --------------------------------------------------------------- */
+.scroll-progress {
+  position: fixed;
+  inset-block-start: 0;
+  inset-inline-start: 0;
+  z-index: 50;
+  block-size: 2px;
+  inline-size: 100%;
+  transform-origin: 0 50%;
+  background-color: var(--accent);
+  /* Hidden by default: an un-animated full-width bar would be wrong.
+     Decorative, so its absence in Firefox costs nothing. */
+  scale: 0 1;
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  @supports (animation-timeline: scroll()) {
+    .scroll-progress {
+      animation: scroll-progress linear;
+      animation-timeline: scroll(root);
+    }
+  }
+}
+
+@keyframes scroll-progress {
+  to {
+    scale: 1 1;
+  }
+}
+
+/* ---------------------------------------------------------------
+   SECTION REVEALS
+
+   `view()` creates a timeline from the element's own position in the
+   viewport, so each element animates as it arrives. Applied to
+   siblings, that produces a natural stagger without a single delay
+   value — the offset comes from the layout itself.
+
+   animation-range `entry 15% cover 35%` means: start when the element
+   is 15% into entering the viewport, finish when it is 35% covered.
+   Finishing well before the element is centred matters — an animation
+   still running when the reader's eye arrives reads as sluggish.
+   --------------------------------------------------------------- */
+@media (prefers-reduced-motion: no-preference) {
+  @supports (animation-timeline: view()) {
+    .reveal {
+      animation: reveal-up linear both;
+      animation-timeline: view();
+      animation-range: entry 15% cover 35%;
+    }
+
+    /* Fade only, for elements where vertical movement would fight the
+       layout — sticky sidebars, grid cells with tight alignment. */
+    .reveal-fade {
+      animation: reveal-fade linear both;
+      animation-timeline: view();
+      animation-range: entry 15% cover 30%;
+    }
+  }
+}
+
+@keyframes reveal-up {
+  from {
+    opacity: 0;
+    transform: translateY(1.5rem);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+@keyframes reveal-fade {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+/* ---------------------------------------------------------------
+   MASKED HEADLINE
+
+   Time-based, not scroll-based: the hero headline is above the fold,
+   so there is no scroll to drive it. Plays once on load.
+
+   The mask is a wrapper with overflow: hidden and a child that slides
+   up from below its own height — so the text appears to rise out of
+   nothing rather than fading in place.
+
+   Needs no @supports: transform and overflow are universal.
+   --------------------------------------------------------------- */
+.mask-line {
+  display: block;
+  overflow: hidden;
+  /* Descenders (g, y, p) get clipped by overflow: hidden without a
+     little breathing room. */
+  padding-block-end: 0.12em;
+  margin-block-end: -0.12em;
+}
+
+.mask-line > * {
+  display: block;
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .mask-line > * {
+    animation: mask-rise 900ms cubic-bezier(0.22, 1, 0.36, 1) both;
+    /* --delay lets stacked lines cascade: style="--delay: 80ms" */
+    animation-delay: var(--delay, 0ms);
+  }
+}
+
+@keyframes mask-rise {
+  from {
+    transform: translateY(105%);
+  }
+  to {
+    transform: none;
+  }
+}
+
+/* ---------------------------------------------------------------
+   FADE-UP ON LOAD
+
+   For above-the-fold content that a scroll timeline can never reach:
+   the hero paragraph and buttons. Small delays so it follows the
+   headline rather than competing with it.
+   --------------------------------------------------------------- */
+@media (prefers-reduced-motion: no-preference) {
+  .enter {
+    animation: reveal-up 700ms cubic-bezier(0.22, 1, 0.36, 1) both;
+    animation-delay: var(--delay, 0ms);
+  }
+}
+
+/* ---------------------------------------------------------------
+   STICKY HEADER
+
+   Gains a border and a shadow once the page has scrolled at all.
+   Driven by scroll position rather than a scroll event listener, so
+   again: no main-thread work.
+   --------------------------------------------------------------- */
+@supports (animation-timeline: scroll()) {
+  .site-header {
+    animation: header-lift linear both;
+    animation-timeline: scroll(root);
+    animation-range: 0 120px;
+  }
+}
+
+@keyframes header-lift {
+  from {
+    border-block-end-color: transparent;
+    box-shadow: 0 0 0 0 transparent;
+  }
+  to {
+    border-block-end-color: var(--border);
+    box-shadow: var(--shadow-ambient);
+  }
+}

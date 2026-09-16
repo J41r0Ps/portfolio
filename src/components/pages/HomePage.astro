@@ -47,21 +47,24 @@ const [featured, stats, skillGroups] = await Promise.all([
   <section class="hero-gradient relative overflow-hidden">
     <div class="container-page grid items-center gap-12 py-15 lg:grid-cols-2 lg:gap-16 lg:py-10">
       <div>
-        <p class="font-mono text-sm tracking-widest text-accent uppercase">
+        <p class="enter font-mono text-sm tracking-widest text-accent uppercase">
           {t("home.role")}
         </p>
 
         <h1
-          class="mt-5 font-display text-5xl leading-[1.05] font-bold tracking-tight text-text sm:text-6xl xl:text-7xl"
+          class="mask-line mt-5 font-display text-5xl leading-[1.05] font-bold tracking-tight text-text sm:text-6xl xl:text-7xl"
         >
-          {t("home.title")}
+          <span>{t("home.title")}</span>
         </h1>
 
-        <p class="mt-6 max-w-lg text-lg leading-relaxed text-text-muted">
+        <p
+          class="enter mt-6 max-w-lg text-lg leading-relaxed text-text-muted"
+          style="--delay: 150ms"
+        >
           {t("home.tagline")}
         </p>
 
-        <div class="mt-9 flex flex-wrap items-center gap-3">
+        <div class="enter mt-9 flex flex-wrap items-center gap-3" style="--delay: 250ms">
           <Button href={localizePath("/projects", locale)}>
             {t("home.hero.cta.work")}
           </Button>
@@ -135,6 +138,7 @@ const [featured, stats, skillGroups] = await Promise.all([
   }
   <section class="container-page py-20 sm:py-28">
     <SectionHeader
+      class="reveal"
       number={2}
       title={t("home.featured.title")}
       subtitle={t("home.featured.subtitle")}
@@ -143,7 +147,7 @@ const [featured, stats, skillGroups] = await Promise.all([
     <ul class="mt-10 grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
       {
         featured.map((project) => (
-          <li class="flex">
+          <li class="reveal flex">
             <ProjectCard project={project} locale={locale} as="h3" />
           </li>
         ))
@@ -168,6 +172,7 @@ const [featured, stats, skillGroups] = await Promise.all([
   <section class="border-t border-border bg-surface-sunken">
     <div class="container-page py-20 sm:py-28">
       <SectionHeader
+        class="reveal"
         number={3}
         title={t("home.skills.title")}
         subtitle={t("home.skills.subtitle")}
@@ -176,7 +181,7 @@ const [featured, stats, skillGroups] = await Promise.all([
       <div class="mt-10 grid gap-8 sm:grid-cols-2 lg:grid-cols-4">
         {
           skillGroups.map((group) => (
-            <div>
+            <div class="reveal">
               <h3 class="font-mono text-xs tracking-widest text-accent uppercase">{group.group}</h3>
               <ul class="mt-4 flex flex-wrap gap-1.5">
                 {group.items.map((item) => (
@@ -199,7 +204,7 @@ const [featured, stats, skillGroups] = await Promise.all([
   }
   <section class="container-page py-20 sm:py-28">
     <div class="grid gap-8 lg:grid-cols-[1fr_1.4fr] lg:gap-16">
-      <SectionHeader number={4} title={t("home.about.title")} />
+      <SectionHeader class="reveal" number={4} title={t("home.about.title")} />
 
       <div>
         <p class="text-lg leading-relaxed text-text-muted">
