@@ -1,15 +1,26 @@
 ---
+/**
+ * HomePage.
+ *
+ * Every number on this page is derived from the content collections at
+ * build time — nothing is hardcoded, so adding a project updates the stat
+ * strip, the skills section and the featured grid in all three languages
+ * at once.
+ *
+ * JavaScript: none below 1024px. On desktop, only the 3D hero, which
+ * hydrates through client:media and loads three.js as a separate chunk.
+ */
 import BaseLayout from "@/layouts/BaseLayout.astro";
 import ProjectCard from "@/components/ProjectCard.astro";
 import Button from "@/components/ui/Button.astro";
 import Chip from "@/components/ui/Chip.astro";
 import SectionHeader from "@/components/ui/SectionHeader.astro";
+import HeroScene from "@/components/three/HeroScene";
 
 import { CV_FILES, type Locale } from "@/i18n/config";
 import { localizePath, useTranslations } from "@/i18n/utils";
 import { getFeaturedProjects, getProjectStats } from "@/lib/projects";
 import { getSkillGroups } from "@/lib/skills";
-import HeroScene from "@/components/three/HeroScene";
 
 interface Props {
   locale: Locale;
@@ -23,6 +34,35 @@ const [featured, stats, skillGroups] = await Promise.all([
   getProjectStats(locale),
   getSkillGroups(locale),
 ]);
+
+/* --------------------------------------------------------------------
+   STATIC TERRAIN FRAME — optional asset
+
+   A frozen frame of the 3D terrain, captured in dev with Alt+P (see
+   DevHelpers.tsx) and saved as src/assets/hero/terrain-mask.png.
+
+   Why import.meta.glob instead of a normal `import`:
+   a normal import of a file that does not exist breaks the build. The
+   glob simply returns an empty object when nothing matches, so the page
+   builds before the frame has been captured, and picks it up the moment
+   the file appears. No code change needed after capturing.
+
+   `eager: true` loads it at build time rather than as a lazy function,
+   and Astro turns the image into a fingerprinted URL for cache-busting.
+   -------------------------------------------------------------------- */
+const maskModules = import.meta.glob<{ default: ImageMetadata }>(
+  "/src/assets/hero/terrain-mask.{png,webp}",
+  { eager: true },
+);
+
+const terrainMask = Object.values(maskModules)[0]?.default;
+
+/**
+ * The URL is handed to CSS as a custom property, so the .terrain-static
+ * rule in global.css can use it as a mask. Undefined → no style, and the
+ * static layers below are not rendered at all.
+ */
+const heroStyle = terrainMask ? `--terrain-mask: url(${terrainMask.src})` : undefined;
 ---
 
 <BaseLayout title={t("home.title")} description={t("home.meta.description")} locale={locale}>
@@ -30,20 +70,47 @@ const [featured, stats, skillGroups] = await Promise.all([
     /* ============================================================
       01 — HERO
 
-      The right-hand box is the future home of the WebGL scene. It
-      gets its final dimensions NOW, filled with a static gradient,
-      so that mounting the canvas later changes nothing about the
-      layout. Reserving space after the fact is how sites end up
-      with content jumping half a second into the load.
+      Three layers of the same terrain, used in different situations:
+
+        mobile        faint static frame behind the text (no JS at all)
+        desktop       static frame in the box, then the live WebGL
+                      terrain fades in over it once the canvas is ready
+        fallback      reduced motion / no WebGL / GPU context lost:
+                      the static frame simply stays
+
+      The box has its final dimensions before any script runs, so the
+      canvas mounting later causes zero layout shift.
       ============================================================ */
   }
-  <section class="hero-gradient relative overflow-hidden">
-    <div class="container-page grid items-center gap-12 py-15 lg:grid-cols-2 lg:gap-16 lg:py-10">
+  <section class="hero-gradient relative overflow-hidden" style={heroStyle}>
+    {
+      /*
+        MOBILE TERRAIN — below 1024px only.
+        No canvas, no React, no layout cost: a CSS mask coloured with
+        var(--accent), so it follows the theme. pointer-events-none so it
+        never blocks taps on the buttons.
+      */
+      terrainMask && (
+        <div
+          aria-hidden="true"
+          class="terrain-static pointer-events-none absolute inset-x-0 bottom-0 h-1/2 opacity-25 lg:hidden"
+        />
+      )
+    }
+
+    {
+      /* `relative` is required: it creates a stacking context so the
+         text paints above the absolutely positioned mobile layer. */
+    }
+    <div
+      class="container-page relative grid items-center gap-12 py-15 lg:grid-cols-2 lg:gap-16 lg:py-10"
+    >
       <div>
         <p class="enter font-mono text-sm tracking-widest text-accent uppercase">
           {t("home.role")}
         </p>
 
+        {/* mask-line clips the inner span so the name rises into view. */}
         <h1
           class="mask-line mt-5 font-display text-5xl leading-[1.05] font-bold tracking-tight text-text sm:text-6xl xl:text-7xl"
         >
@@ -70,18 +137,42 @@ const [featured, stats, skillGroups] = await Promise.all([
         </div>
       </div>
 
+      {
+        /*
+          DESKTOP 3D BOX — hidden below lg, so phones never see an empty
+          rectangle. aria-hidden: purely decorative.
+        */
+      }
       <div
         id="hero-visual"
         aria-hidden="true"
         class="relative mx-auto hidden aspect-square w-full max-w-md rounded-2xl border border-border
-         bg-linear-to-br from-accent/10 via-transparent to-accent/5 lg:block lg:max-w-lg"
+               bg-linear-to-br from-accent/10 via-transparent to-accent/5 lg:block lg:max-w-lg"
       >
+        {/* Soft accent glow — the base layer, always present. */}
         <div
           class="absolute inset-0 rounded-2xl bg-[radial-gradient(circle_at_50%_40%,var(--accent),transparent_65%)] opacity-[0.18]"
         >
         </div>
 
-        <HeroScene client:media="(min-width: 1024px)" />
+        {
+          /*
+            STATIC FRAME — visible until the canvas sets data-live on
+            #hero-visual, then cross-fades out (see global.css). If the
+            canvas never starts, or loses its GPU context, it stays.
+          */
+          terrainMask && <div class="terrain-static absolute inset-0 rounded-2xl opacity-80" />
+        }
+
+        {
+          /*
+            LIVE TERRAIN — client:media only hydrates at ≥1024px. Below
+            that width no hero JavaScript is requested at all, React
+            included. HeroScene then decides internally whether to load
+            three.js (reduced motion, WebGL support, context loss).
+          */
+        }
+        <HeroScene client:only="react" />
       </div>
     </div>
   </section>

@@ -1,22 +1,22 @@
 /**
  * HeroScene — the gate, not the scene.
  *
- * This file is deliberately tiny. It decides whether the 3D is worth
- * loading at all, and only then dynamically imports it. Because the
- * import is dynamic, Vite puts three.js in its own chunk — so a phone,
- * a browser without WebGL, or a visitor who asked for reduced motion
- * never downloads it. Not deferred. Never requested.
+ * Mounted with client:media="(min-width: 1024px)", so below that width
+ * this component never hydrates and no hero JavaScript is requested at
+ * all, React included. Phones get the static terrain frame instead.
  *
- * The alternative — one component that renders <Canvas> conditionally —
- * would ship the entire three.js bundle to every visitor and then
- * decide not to use it.
+ * Inside the gate, three more checks: reduced motion, WebGL support,
+ * and whether the canvas has failed during the session. Only when all
+ * pass is the three.js chunk dynamically imported.
+ *
+ * Safe to render on the server: `window` is only touched inside
+ * useEffect, and the lazy import never runs until it renders client-side.
  */
 
 import { lazy, Suspense, useEffect, useState } from 'react';
 
 const TerrainCanvas = lazy(() => import('./TerrainCanvas'));
 
-/** Below this width the static gradient is the better experience. */
 const MIN_WIDTH = 1024;
 
 function supportsWebGL(): boolean {
@@ -31,6 +31,13 @@ function supportsWebGL(): boolean {
 export default function HeroScene() {
   const [shouldRender, setShouldRender] = useState(false);
 
+  /**
+   * Set when the GPU drops the context mid-session. Once failed, the
+   * hero stays on its static frame for the rest of the visit — retrying
+   * a context the browser just reclaimed tends to fail again.
+   */
+  const [failed, setFailed] = useState(false);
+
   useEffect(() => {
     const motionQuery = window.matchMedia('(prefers-reduced-motion: reduce)');
     const widthQuery = window.matchMedia(`(min-width: ${MIN_WIDTH}px)`);
@@ -40,9 +47,6 @@ export default function HeroScene() {
     };
 
     evaluate();
-
-    // Someone resizing across the breakpoint, or changing their OS
-    // motion setting with the page open, gets the right result.
     motionQuery.addEventListener('change', evaluate);
     widthQuery.addEventListener('change', evaluate);
 
@@ -52,13 +56,11 @@ export default function HeroScene() {
     };
   }, []);
 
-  if (!shouldRender) return null;
+  if (!shouldRender || failed) return null;
 
-  // No fallback: the static gradient underneath stays visible until the
-  // canvas is ready, so there is nothing to swap in.
   return (
     <Suspense fallback={null}>
-      <TerrainCanvas />
+      <TerrainCanvas onFail={() => setFailed(true)} />
     </Suspense>
   );
 }

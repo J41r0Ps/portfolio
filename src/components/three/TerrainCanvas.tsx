@@ -1,31 +1,63 @@
 /**
  * TerrainCanvas — the only <Canvas> in this codebase. Ever.
  *
- * Browsers cap WebGL contexts at roughly sixteen and silently kill the
- * oldest when you exceed it. One canvas also means one place to profile
- * when something is slow.
- *
- * Everything expensive is gated:
- *   • frameloop switches to 'never' when off-screen or the tab is hidden
- *   • dpr is capped at 1.5 — uncapped on a Retina display means four
- *     times the pixels for no visible gain
- *   • no antialias; the terrain is lines, and the cost is not worth it
+ * Responsibilities beyond rendering:
+ *   • stop rendering when off-screen or the tab is hidden
+ *   • tell the page when it is live, so the static frame cross-fades out
+ *   • recover gracefully if the GPU drops the WebGL context
  */
 
 import { Canvas } from '@react-three/fiber';
 import { useEffect, useRef, useState } from 'react';
 
+import { DevStats, FrameCapture } from './DevHelpers';
 import Terrain from './Terrain';
 import { useAccentColor } from './useAccentColor';
 
-export default function TerrainCanvas() {
+interface Props {
+  /** Called if the WebGL context is lost while this canvas is mounted. */
+  onFail: () => void;
+}
+
+const HOST_ID = 'hero-visual';
+
+export default function TerrainCanvas({ onFail }: Props) {
   const containerRef = useRef<HTMLDivElement>(null);
   const [inView, setInView] = useState(true);
   const [tabVisible, setTabVisible] = useState(true);
 
+  /**
+   * ─────────────────────────────────────────────────────────────────
+   * WHY THIS REF EXISTS
+   *
+   * R3F deliberately forces a WebGL context loss when the canvas
+   * unmounts — it is how it frees GPU memory immediately instead of
+   * waiting for garbage collection. That fires the same
+   * `webglcontextlost` event a real GPU failure does.
+   *
+   * Without this guard, resizing below 1024px would unmount the
+   * canvas, trigger the event, mark the hero as failed, and the
+   * terrain would never come back on resizing up again.
+   *
+   * The event is dispatched asynchronously, after React has run this
+   * component's cleanup, so by then `mounted` is false and the handler
+   * can tell an intentional teardown from a real failure.
+   * ─────────────────────────────────────────────────────────────────
+   */
+  const mounted = useRef(true);
+
   const accent = useAccentColor();
 
-  /* Stop rendering once the hero scrolls away. */
+  useEffect(() => {
+    mounted.current = true;
+
+    return () => {
+      mounted.current = false;
+      // Bring the static frame back if the canvas goes away.
+      document.getElementById(HOST_ID)?.removeAttribute('data-live');
+    };
+  }, []);
+
   useEffect(() => {
     const element = containerRef.current;
     if (!element) return;
@@ -39,9 +71,6 @@ export default function TerrainCanvas() {
     return () => observer.disconnect();
   }, []);
 
-  /* Stop rendering when the tab is in the background. Without this the
-     scene keeps animating in a tab nobody is looking at — on a laptop
-     that is measurable battery drain. */
   useEffect(() => {
     const onChange = () => setTabVisible(!document.hidden);
     document.addEventListener('visibilitychange', onChange);
@@ -51,14 +80,34 @@ export default function TerrainCanvas() {
   const active = inView && tabVisible;
 
   return (
-    <div ref={containerRef} className="absolute inset-0 rounded-2xl overflow-hidden">
+    <div ref={containerRef} className="absolute inset-0 overflow-hidden rounded-2xl">
       <Canvas
         frameloop={active ? 'always' : 'never'}
         dpr={[1, 1.5]}
         gl={{ antialias: false, alpha: true, powerPreference: 'low-power' }}
         camera={{ position: [0, 1.4, 3.2], fov: 42 }}
+        onCreated={({ gl }) => {
+          // The canvas exists and has a context: cross-fade the static
+          // frame out. CSS handles the transition.
+          document.getElementById(HOST_ID)?.setAttribute('data-live', '');
+
+          gl.domElement.addEventListener(
+            'webglcontextlost',
+            () => {
+              if (!mounted.current) return; // intentional teardown, see above
+              document.getElementById(HOST_ID)?.removeAttribute('data-live');
+              onFail();
+            },
+            { once: true },
+          );
+        }}
       >
         <Terrain color={accent} />
+
+        {/* Replaced with `false` at build time, so neither helper
+            reaches the production bundle. */}
+        {import.meta.env.DEV && <DevStats />}
+        {import.meta.env.DEV && <FrameCapture />}
       </Canvas>
     </div>
   );
