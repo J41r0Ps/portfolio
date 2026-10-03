@@ -2,7 +2,7 @@
 
 A running log. One entry per decision that would be expensive or annoying to reverse.
 Newest at the bottom. The point is that future-me (and anyone reviewing this repo) can see
-*why*, not just *what*.
+_why_, not just _what_.
 
 Format: **Context** → **Decision** → **Consequences**.
 
@@ -20,13 +20,13 @@ runtime is being shipped for prose.
 
 **Options considered**
 
-- *React + Vite (status quo)* — no static output, no per-locale URLs. Rejected.
-- *Next.js* — capable, but the App Router removed built-in i18n routing, and it ships a React
+- _React + Vite (status quo)_ — no static output, no per-locale URLs. Rejected.
+- _Next.js_ — capable, but the App Router removed built-in i18n routing, and it ships a React
   runtime plus hydration for pages that are mostly text. It's a full-stack framework for a
   project with no server needs.
-- *SvelteKit + Threlte* — technically excellent and lighter, but a new component model and a
+- _SvelteKit + Threlte_ — technically excellent and lighter, but a new component model and a
   smaller 3D ecosystem to learn simultaneously.
-- *Astro* — zero JS by default, native i18n routing, content collections, React islands so
+- _Astro_ — zero JS by default, native i18n routing, content collections, React islands so
   existing React knowledge transfers.
 
 **Decision**
@@ -158,6 +158,27 @@ switching remaps the semantic layer.
 
 ---
 
+## ADR-008 · React pinned to 19.2
+
+**Date**: 2026-09 · **Status**: accepted
+
+**Context**
+`@react-three/fiber` 9.7 declares `react@">=19 <19.3"`. It is built on
+react-reconciler, which compiles against React's internal API and is
+version-locked to it. `--force` would install but risks runtime failures
+inside the renderer that surface as a blank canvas.
+
+**Decision**
+Pin React and React DOM with `~19.2.8`. Patches allowed, minors not.
+
+**Consequences**
+
+- React cannot be upgraded until R3F widens its peer range.
+- Reviewed whenever R3F is updated.
+- Removing R3F in favour of vanilla three.js would remove this constraint.
+
+===
+
 **Consequences**
 
 - Commit history is preserved as dated evidence of authorship.
@@ -178,14 +199,14 @@ switching remaps the semantic layer.
 Every third-party asset, with its licence and obligations. Checked **before** the asset
 becomes load-bearing, not after launch.
 
-| Asset | Source | Licence | Obligation | Verified |
-| --- | --- | --- | --- | --- |
-| Space Grotesk | Florian Karsten / Google Fonts | SIL OFL 1.1 | Ship `OFL.txt`; don't sell the font | ⬜ |
-| Geist | Vercel | SIL OFL 1.1 | Ship `OFL.txt`; don't sell the font | ⬜ |
-| Geist Mono | Vercel | SIL OFL 1.1 | Ship `OFL.txt`; don't sell the font | ⬜ |
-| Icon set | *tbd* | | | ⬜ |
-| 3D model(s) | *tbd* | | ⚠️ Check for CC-BY attribution requirements | ⬜ |
-| Photography | Own work | © author | — | ⬜ |
+| Asset         | Source                         | Licence     | Obligation                                  | Verified |
+| ------------- | ------------------------------ | ----------- | ------------------------------------------- | -------- |
+| Space Grotesk | Florian Karsten / Google Fonts | SIL OFL 1.1 | Ship `OFL.txt`; don't sell the font         | ⬜       |
+| Geist         | Vercel                         | SIL OFL 1.1 | Ship `OFL.txt`; don't sell the font         | ⬜       |
+| Geist Mono    | Vercel                         | SIL OFL 1.1 | Ship `OFL.txt`; don't sell the font         | ⬜       |
+| Icon set      | _tbd_                          |             |                                             | ⬜       |
+| 3D model(s)   | _tbd_                          |             | ⚠️ Check for CC-BY attribution requirements | ⬜       |
+| Photography   | Own work                       | © author    | —                                           | ⬜       |
 
 **Rule**: nothing enters the repo until its row exists here. npm dependencies get the same
 treatment — GPL/AGPL packages are flagged before they become load-bearing.

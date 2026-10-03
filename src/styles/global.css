@@ -69,8 +69,8 @@
   --text: var(--color-mist-900);
   --text-muted: var(--color-mist-600);
 
-  --accent: var(--color-sage-500);
-  --accent-hover: var(--color-sage-700);
+  --accent: var(--color-sage-700); 
+  --accent-hover: var(--color-sage-500);
   --on-accent: var(--color-mist-50);
 
   --border: rgb(29 42 39 / 0.12);

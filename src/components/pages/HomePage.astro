@@ -1,12 +1,4 @@
 ---
-/**
- * HomePage.
- *
- * Ships zero JavaScript. Every number on this page is derived from the
- * content collections at build time — nothing is hardcoded, so adding a
- * project updates the stat strip, the skills section and the featured
- * grid in all three languages at once.
- */
 import BaseLayout from "@/layouts/BaseLayout.astro";
 import ProjectCard from "@/components/ProjectCard.astro";
 import Button from "@/components/ui/Button.astro";
@@ -17,6 +9,7 @@ import { CV_FILES, type Locale } from "@/i18n/config";
 import { localizePath, useTranslations } from "@/i18n/utils";
 import { getFeaturedProjects, getProjectStats } from "@/lib/projects";
 import { getSkillGroups } from "@/lib/skills";
+import HeroScene from "@/components/three/HeroScene";
 
 interface Props {
   locale: Locale;
@@ -77,28 +70,18 @@ const [featured, stats, skillGroups] = await Promise.all([
         </div>
       </div>
 
-      {
-        /*
-        RESERVED CANVAS SLOT — Session 13.
-        aspect-square + max-w keeps the box identical before and after
-        the scene exists. `aria-hidden` because it is decoration: a
-        screen reader gains nothing from being told there is a gradient.
-      */
-      }
       <div
         id="hero-visual"
         aria-hidden="true"
-        class="relative mx-auto aspect-square w-full max-w-md
-               rounded-2xl border border-border
-               bg-linear-to-br from-accent/10 via-transparent to-accent/5
-               lg:max-w-lg"
+        class="relative mx-auto hidden aspect-square w-full max-w-md rounded-2xl border border-border
+         bg-linear-to-br from-accent/10 via-transparent to-accent/5 lg:block lg:max-w-lg"
       >
         <div
-          class="absolute inset-0 rounded-2xl
-                 bg-[radial-gradient(circle_at_50%_40%,var(--accent),transparent_65%)]
-                 opacity-[0.18]"
+          class="absolute inset-0 rounded-2xl bg-[radial-gradient(circle_at_50%_40%,var(--accent),transparent_65%)] opacity-[0.18]"
         >
         </div>
+
+        <HeroScene client:media="(min-width: 1024px)" />
       </div>
     </div>
   </section>

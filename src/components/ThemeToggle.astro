@@ -6,10 +6,8 @@
  * localStorage write; hydrating React for it would ship ~45kb on every
  * page to save six lines of DOM code. An island has to earn its bundle.
  *
- * The <script> below is a normal Astro script, not `is:inline`: it only
- * runs on click, so being deferred costs nothing, and Astro bundles and
- * minifies it. The *init* script in BaseLayout must stay `is:inline`,
- * because that one has to beat the first paint.
+ * The script element below is a normal Astro script, not `is:inline`:
+ * it only runs on click, so being deferred costs nothing...
  */
 import { useTranslations } from "@/i18n/utils";
 import type { Locale } from "@/i18n/config";
@@ -35,7 +33,7 @@ const t = useTranslations(locale);
 >
   {/* Shown in light mode: click to go dark. */}
   <svg
-    class="h-[18px] w-[18px] dark:hidden"
+    class="h-4.5 w-4.5 dark:hidden"
     viewBox="0 0 24 24"
     fill="none"
     stroke="currentColor"
@@ -49,7 +47,7 @@ const t = useTranslations(locale);
 
   {/* Shown in dark mode: click to go light. */}
   <svg
-    class="hidden h-[18px] w-[18px] dark:block"
+    class="hidden h-4.5 w-4.5 dark:block"
     viewBox="0 0 24 24"
     fill="none"
     stroke="currentColor"
