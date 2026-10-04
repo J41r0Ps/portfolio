@@ -192,6 +192,26 @@ export const en = {
   "context.course": "Course project",
   "context.group": "Team project",
   "context.freelance": "Freelance",
+
+  // --- contact ---
+  "contact.title": "Get in touch",
+  "contact.meta.description":
+    "Contact Jairo Nacurena — Applied Computer Science student in Belgium, looking for a full-stack or backend internship.",
+  "contact.intro":
+    "Looking for a full-stack or backend intern? Have a question about one of my projects? Send a message and I will reply within two working days.",
+  "contact.availability": "Available for an internship from February 2027",
+  "contact.direct": "Direct",
+  "contact.elsewhere": "Elsewhere",
+  "contact.location": "Based in",
+  "contact.form.name": "Name",
+  "contact.form.email": "Email",
+  "contact.form.message": "Message",
+  "contact.form.send": "Send message",
+  "contact.form.sending": "Sending…",
+  "contact.form.success": "Thank you — your message has been sent. I will get back to you soon.",
+  "contact.form.error":
+    "Something went wrong and your message was not sent. Please try again, or email me directly.",
+  "contact.form.subject": "New message from jaironacurena.com",
 } satisfies Record<string, string>;
 
 /**
@@ -355,6 +375,25 @@ export const nl: Dictionary = {
   "context.course": "Cursusproject",
   "context.group": "Teamproject",
   "context.freelance": "Freelance",
+
+  "contact.title": "Neem contact op",
+  "contact.meta.description":
+    "Contacteer Jairo Nacurena — student Toegepaste Informatica in België, op zoek naar een stage in full-stack of backend development.",
+  "contact.intro":
+    "Op zoek naar een stagiair voor full-stack of backend? Een vraag over een van mijn projecten? Stuur een bericht en ik antwoord binnen twee werkdagen.",
+  "contact.availability": "Beschikbaar voor een stage vanaf februari 2027",
+  "contact.direct": "Rechtstreeks",
+  "contact.elsewhere": "Elders",
+  "contact.location": "Gevestigd in",
+  "contact.form.name": "Naam",
+  "contact.form.email": "E-mail",
+  "contact.form.message": "Bericht",
+  "contact.form.send": "Bericht versturen",
+  "contact.form.sending": "Versturen…",
+  "contact.form.success": "Bedankt — je bericht is verstuurd. Ik neem snel contact met je op.",
+  "contact.form.error":
+    "Er ging iets mis en je bericht is niet verstuurd. Probeer het opnieuw, of mail me rechtstreeks.",
+  "contact.form.subject": "Nieuw bericht via jaironacurena.com",
 };
 
 export const es: Dictionary = {
@@ -510,6 +549,25 @@ export const es: Dictionary = {
   "context.course": "Proyecto de curso",
   "context.group": "Proyecto en equipo",
   "context.freelance": "Freelance",
+
+  "contact.title": "Contacto",
+  "contact.meta.description":
+    "Contacta con Jairo Nacurena — estudiante de Informática Aplicada en Bélgica, en busca de prácticas en desarrollo full-stack o backend.",
+  "contact.intro":
+    "¿Buscas un becario full-stack o backend? ¿Tienes una pregunta sobre alguno de mis proyectos? Envíame un mensaje y te respondo en dos días laborables.",
+  "contact.availability": "Disponible para prácticas a partir de febrero de 2027",
+  "contact.direct": "Directo",
+  "contact.elsewhere": "En otros sitios",
+  "contact.location": "Ubicación",
+  "contact.form.name": "Nombre",
+  "contact.form.email": "Correo electrónico",
+  "contact.form.message": "Mensaje",
+  "contact.form.send": "Enviar mensaje",
+  "contact.form.sending": "Enviando…",
+  "contact.form.success": "Gracias — tu mensaje se ha enviado. Te responderé pronto.",
+  "contact.form.error":
+    "Algo salió mal y tu mensaje no se envió. Inténtalo de nuevo o escríbeme directamente.",
+  "contact.form.subject": "Nuevo mensaje desde jaironacurena.com",
 };
 
 export const ui: Record<Locale, Dictionary> = { en, nl, es };

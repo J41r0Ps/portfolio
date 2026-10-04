@@ -535,3 +535,31 @@
     transition: none;
   }
 }
+
+@utility field {
+  display: block;
+  width: 100%;
+  border: 1px solid var(--border-strong);
+  border-radius: 0.5rem;
+  background-color: var(--surface-raised);
+  padding: 0.625rem 0.875rem;
+  font-size: 0.9375rem;
+  color: var(--text);
+  transition: border-color 150ms ease;
+
+  &:hover {
+    border-color: var(--accent);
+  }
+
+  &:focus-visible {
+    border-color: var(--accent);
+    outline: 2px solid var(--accent);
+    outline-offset: 1px;
+  }
+
+  /* :user-invalid only applies AFTER the visitor has interacted with
+     the field, so the form does not open covered in red errors. */
+  &:user-invalid {
+    border-color: rgb(239 68 68);
+  }
+}

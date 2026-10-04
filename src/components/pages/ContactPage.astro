@@ -1,0 +1,265 @@
+---
+/**
+ * ContactPage.
+ *
+ * No backend. The form posts to Web3Forms, which emails the message to
+ * the inbox registered with the access key. Nothing of ours has to stay
+ * online, be patched or be paid for — and nothing can go down and
+ * silently lose a recruiter's message.
+ *
+ * Progressive enhancement:
+ *   • without JavaScript, the form is a normal HTML POST to Web3Forms
+ *     and the visitor lands on their default "sent" page
+ *   • with JavaScript (a tiny vanilla script, no React), the submit is
+ *     intercepted, sent with fetch, and the result shown in place
+ *
+ * The access key is designed by Web3Forms to be public: it only allows
+ * sending email TO you. It lives in .env so it is configuration rather
+ * than a hardcoded value, and so a fork of this repo does not email you.
+ */
+import BaseLayout from '@/layouts/BaseLayout.astro';
+import SectionHeader from '@/components/ui/SectionHeader.astro';
+import Button from '@/components/ui/Button.astro';
+
+import type { Locale } from '@/i18n/config';
+import { useTranslations } from '@/i18n/utils';
+import { SITE, SOCIALS } from '@/lib/site';
+
+interface Props {
+  locale: Locale;
+}
+
+const { locale }: Props = Astro.props;
+const t = useTranslations(locale);
+
+/**
+ * PUBLIC_ prefix: Vite only exposes variables with this prefix to
+ * client-side code, and inlines them at BUILD time. That means the
+ * deploy environment (Session 18) must have it set too, not just .env.
+ *
+ * If the key is missing, the form is replaced by a plain mailto link
+ * rather than shipping a form that cannot work.
+ */
+const accessKey: string | undefined = import.meta.env.PUBLIC_WEB3FORMS_KEY;
+
+const ENDPOINT = 'https://api.web3forms.com/submit';
+
+const others = SOCIALS.filter((social) => social.icon !== 'mail');
+---
+
+<BaseLayout title={t('contact.title')} description={t('contact.meta.description')} locale={locale}>
+  <section class="hero-gradient border-b border-border">
+    <div class="container-page py-16 sm:py-20">
+      <SectionHeader number={1} title={t('contact.title')} subtitle={t('contact.intro')} as="h1" />
+
+      {/* The single most useful line for a recruiter. Kept prominent. */}
+      <p class="mt-8 inline-flex items-center gap-2 rounded-full border border-accent/40 bg-surface-raised px-4 py-2 font-mono text-xs text-text">
+        <span class="h-2 w-2 rounded-full bg-accent" aria-hidden="true"></span>
+        {t('contact.availability')}
+      </p>
+    </div>
+  </section>
+
+  <div class="container-page grid gap-14 py-16 sm:py-20 lg:grid-cols-[1fr_300px] lg:gap-16">
+    {/* ------------------------------ FORM ------------------------------ */}
+    <div class="max-w-2xl">
+      {
+        accessKey ? (
+          <form
+            action={ENDPOINT}
+            method="POST"
+            data-contact-form
+            data-sending={t('contact.form.sending')}
+            data-success={t('contact.form.success')}
+            data-error={t('contact.form.error')}
+            class="space-y-6"
+          >
+            <input type="hidden" name="access_key" value={accessKey} />
+            <input type="hidden" name="subject" value={t('contact.form.subject')} />
+            <input type="hidden" name="from_name" value="jaironacurena.com" />
+
+            {/*
+              HONEYPOT. Invisible to people, so a real visitor never
+              ticks it; spam bots fill every field they find, and
+              Web3Forms silently discards any submission where it is set.
+              tabindex -1 keeps it out of keyboard navigation, and
+              aria-hidden keeps screen readers from announcing it.
+            */}
+            <input
+              type="checkbox"
+              name="botcheck"
+              class="hidden"
+              tabindex="-1"
+              autocomplete="off"
+              aria-hidden="true"
+            />
+
+            <div class="grid gap-6 sm:grid-cols-2">
+              <div>
+                <label for="contact-name" class="font-mono text-xs tracking-wide text-text-muted uppercase">
+                  {t('contact.form.name')}
+                </label>
+                <input
+                  id="contact-name"
+                  name="name"
+                  type="text"
+                  required
+                  minlength="2"
+                  maxlength="100"
+                  autocomplete="name"
+                  class="field mt-2"
+                />
+              </div>
+
+              <div>
+                <label for="contact-email" class="font-mono text-xs tracking-wide text-text-muted uppercase">
+                  {t('contact.form.email')}
+                </label>
+                {/* Named "email": Web3Forms uses it as the reply-to,
+                    so replying in Gmail goes straight to the sender. */}
+                <input
+                  id="contact-email"
+                  name="email"
+                  type="email"
+                  required
+                  autocomplete="email"
+                  class="field mt-2"
+                />
+              </div>
+            </div>
+
+            <div>
+              <label for="contact-message" class="font-mono text-xs tracking-wide text-text-muted uppercase">
+                {t('contact.form.message')}
+              </label>
+              <textarea
+                id="contact-message"
+                name="message"
+                required
+                minlength="10"
+                maxlength="5000"
+                rows="7"
+                class="field mt-2 resize-y"
+              />
+            </div>
+
+            <div class="flex flex-wrap items-center gap-4">
+              <Button type="submit" data-submit>
+                {t('contact.form.send')}
+              </Button>
+
+              {/*
+                Live region: the result is announced to screen readers.
+                role="status" for success; the script switches it to
+                role="alert" on failure, which is announced immediately.
+              */}
+              <p data-status role="status" aria-live="polite" class="text-sm text-text-muted"></p>
+            </div>
+          </form>
+        ) : (
+          <p class="text-text-muted">
+            <a href={`mailto:${SITE.email}`} class="text-accent underline underline-offset-4">
+              {SITE.email}
+            </a>
+          </p>
+        )
+      }
+    </div>
+
+    {/* ---------------------------- SIDEBAR ---------------------------- */}
+    <aside class="space-y-8">
+      <div>
+        <h2 class="font-mono text-xs tracking-widest text-accent uppercase">{t('contact.direct')}</h2>
+        <a
+          href={`mailto:${SITE.email}`}
+          class="mt-3 block break-all text-sm text-text transition-colors hover:text-accent"
+        >
+          {SITE.email}
+        </a>
+      </div>
+
+      <div>
+        <h2 class="font-mono text-xs tracking-widest text-accent uppercase">{t('contact.elsewhere')}</h2>
+        <ul class="mt-3 space-y-2">
+          {
+            others.map((social) => (
+              <li>
+                <a
+                  href={social.href}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  class="text-sm text-text transition-colors hover:text-accent"
+                >
+                  {social.label} ↗
+                </a>
+              </li>
+            ))
+          }
+        </ul>
+      </div>
+
+      <div>
+        <h2 class="font-mono text-xs tracking-widest text-accent uppercase">{t('contact.location')}</h2>
+        <p class="mt-3 text-sm text-text">{SITE.location}</p>
+      </div>
+    </aside>
+  </div>
+</BaseLayout>
+
+<script>
+  /**
+   * Enhances the form when JavaScript is available. Vanilla on purpose:
+   * one fetch and three text updates do not justify a React island.
+   *
+   * Translated messages arrive through data-* attributes on the form,
+   * because t() only exists at build time.
+   */
+  function initContactForm() {
+    const form = document.querySelector<HTMLFormElement>('[data-contact-form]');
+    if (!form) return;
+
+    const status = form.querySelector<HTMLElement>('[data-status]');
+    const submit = form.querySelector<HTMLButtonElement>('[data-submit]');
+
+    form.addEventListener('submit', async (event) => {
+      event.preventDefault();
+
+      // Native validation (required, type="email", minlength) runs before
+      // the submit event fires, so reaching this point means it passed.
+      if (!status || !submit) return;
+
+      const originalLabel = submit.textContent;
+      submit.disabled = true;
+      submit.textContent = form.dataset.sending ?? '';
+      status.textContent = '';
+      status.setAttribute('role', 'status');
+
+      try {
+        const response = await fetch(form.action, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json', Accept: 'application/json' },
+          body: JSON.stringify(Object.fromEntries(new FormData(form))),
+        });
+
+        const result = (await response.json()) as { success?: boolean };
+
+        if (!response.ok || !result.success) throw new Error('Submission rejected');
+
+        status.textContent = form.dataset.success ?? '';
+        status.className = 'text-sm text-accent';
+        form.reset();
+      } catch {
+        // role="alert" makes screen readers announce the failure
+        // immediately rather than waiting for a pause.
+        status.setAttribute('role', 'alert');
+        status.textContent = form.dataset.error ?? '';
+        status.className = 'text-sm text-red-500';
+      } finally {
+        submit.disabled = false;
+        submit.textContent = originalLabel;
+      }
+    });
+  }
+
+  initContactForm();
+</script>
