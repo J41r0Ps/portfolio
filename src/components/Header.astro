@@ -6,7 +6,8 @@
  * vanilla. Nav links, the active state and the CV href are all resolved
  * at build time.
  */
-import { CV_FILES, type Locale } from "@/i18n/config";
+import type { Locale } from "@/i18n/config";
+import { getCv } from "@/lib/cv";
 import { localizePath, stripLocale, useTranslations } from "@/i18n/utils";
 import { NAV_ITEMS } from "@/lib/nav";
 import LocaleSwitcher from "@/components/LocaleSwitcher.astro";
@@ -32,7 +33,7 @@ const isActive = (path: string) =>
   path === "/" ? currentPath === "/" : currentPath.startsWith(path);
 
 const homeHref = localizePath("/", locale);
-const cvHref = CV_FILES[locale];
+const cvHref = getCv(locale).href;
 ---
 
 <header
